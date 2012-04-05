@@ -4,20 +4,21 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT  += core
+QT  -= gui
 
 TARGET = HeadPoseEstimation
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    inputgraphicsview.cpp
+    yawdetector.cpp
 
-HEADERS  += mainwindow.h \
-    inputgraphicsview.h
+HEADERS  += \
+    yawdetector.h \
+    image.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 unix: CONFIG += link_pkgconfig
 unix: PKGCONFIG += opencv
