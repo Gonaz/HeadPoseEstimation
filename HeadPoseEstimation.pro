@@ -12,11 +12,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-    yawdetector.cpp
+    yawdetector.cpp \
+    pitchdetector.cpp
 
 HEADERS  += \
     yawdetector.h \
-    image.h
+    image.h \
+    pitchdetector.h
 
 FORMS    +=
 

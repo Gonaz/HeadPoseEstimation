@@ -10,8 +10,7 @@ class YawDetector {
 public:
 	YawDetector(bool train);
 	YawDetector(QString retainDir);
-	long operator ()(QString image);
-	void crossValidateYaw();
+	long operator()(QString image);
 	int yaw(QString filename); //TODO public?
 private:
 	QMap<QString, QPair<long, long> > positions;

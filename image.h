@@ -3,25 +3,23 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <iostream> //TODO debug
 
-namespace image{
-	using namespace cv;
+class Image{
+public:
 
-	vector<Rect> detectEyes(Mat image);
-	long getRelativePositionEye(Mat image, Rect eye);
-	vector<Rect> detect(Mat image, QString file, size_t amount=1);
-
-	long getRelativePositionEye(Mat image, Rect eye){
+	static long getRelativePositionEye(cv::Mat image, cv::Rect eye){
 		long center = eye.x + (eye.width/2);
 		return center/double(image.cols)*100;
 	}
 
-	vector<Rect> detectEyes(Mat image){
+	static cv::vector<cv::Rect> detectEyes(cv::Mat image){
 		//TODO adaptive resize
 		double scale = 0.4;
 		double iScale = 1/scale;
-		resize(image, image, Size(image.cols*scale, image.rows*scale));
-		vector<Rect> eyes = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml", 2);
+		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
+//		cv::GaussianBlur(image, image, cv::Size(7,7), 0);
+		cv::vector<cv::Rect> eyes = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml", 2);
 		if(eyes.size() > 1){
 			if(eyes.at(0).tl().y > eyes.at(1).br().y){
 				eyes.erase(eyes.begin());
@@ -31,17 +29,39 @@ namespace image{
 		}
 
 		for(size_t i=0; i<eyes.size(); ++i){
-			Rect r = eyes.at(i);
-			Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
+			cv::Rect r = eyes.at(i);
+			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
 			eyes.at(i) = newR;
 		}
 
 		return eyes;
 	}
 
-	vector<Rect> detect(Mat image, QString file, size_t amount){
-		vector<Rect> rectangles;
-		CascadeClassifier cc(file.toStdString());
+	static cv::vector<cv::Rect> detectMouth(cv::Mat image){
+		//TODO adaptive resize
+		double scale = 0.4;
+		double iScale = 1/scale;
+		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
+		cv::vector<cv::Rect> mouth = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml", 1);
+
+		for(auto it=mouth.begin(); it != mouth.end(); ++it){
+			if((*it).tl().y < image.rows/2){
+				mouth.erase(it--);
+			}
+		}
+
+		for(size_t i=0; i<mouth.size(); ++i){
+			cv::Rect r = mouth.at(i);
+			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
+			mouth.at(i) = newR;
+		}
+
+		return mouth;
+	}
+
+	static cv::vector<cv::Rect> detect(cv::Mat image, QString file, size_t amount){
+		cv::vector<cv::Rect> rectangles;
+		cv::CascadeClassifier cc(file.toStdString());
 		cc.detectMultiScale(image, rectangles);
 		int param = 5;
 		while(rectangles.size() > amount){
@@ -52,5 +72,6 @@ namespace image{
 		return rectangles;
 	}
 
-}//namespace image
+};
+
 #endif // IMAGE_H

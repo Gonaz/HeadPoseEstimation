@@ -5,6 +5,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <algorithm>
+#include <iostream> //TODO debug
 
 using namespace cv;
 
@@ -29,14 +30,15 @@ YawDetector::YawDetector(QString retainDir){
 
 long YawDetector::operator ()(QString image){
 	Mat image1 = imread(image.toStdString());
-	vector<Rect> eyes1 = image::detectEyes(image1);
+	vector<Rect> eyes1 = Image::detectEyes(image1);
 	long position1 = 0;
 	for(size_t i=0; i<eyes1.size(); ++i){
-		position1 += image::getRelativePositionEye(image1, eyes1.at(i));
+		position1 += Image::getRelativePositionEye(image1, eyes1.at(i));
 	}
 	if(eyes1.size() > 0){
 		position1 /= eyes1.size();
 	}
+	std::cout << "Aantal ogen " << eyes1.size() << std::endl;
 
 	QMultiMap<long, QString> scores;
 	auto images = positions.keys();
@@ -65,6 +67,10 @@ long YawDetector::operator ()(QString image){
 		auto key = scores.key(image);
 		scores.remove(key);
 	}
+
+	int i = 200;
+	std::cout << getBest(scores, i).first << getBest(scores, i).second.toStdString() << std::endl;
+
 	return yaw(getBest(scores).second);
 }
 
@@ -80,13 +86,13 @@ QMap<QString, QPair<long, long> > YawDetector::calculateRelativePositions() {
 		foreach(QString image, images){
 			QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
 			Mat image = imread(imagePath.toStdString());
-			vector<Rect> eyes = image::detectEyes(image);
+			vector<Rect> eyes = Image::detectEyes(image);
 			if(eyes.size() == 0){
 				result.insert(imagePath, qMakePair(-1l, -1l));
 			} else if(eyes.size() == 1){
-				result.insert(imagePath, qMakePair(image::getRelativePositionEye(image, eyes.at(0)), -1l));
+				result.insert(imagePath, qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), -1l));
 			} else {
-				result.insert(imagePath, qMakePair(image::getRelativePositionEye(image, eyes.at(0)), image::getRelativePositionEye(image, eyes.at(1))));
+				result.insert(imagePath, qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1))));
 			}
 		}
 	}
@@ -149,7 +155,7 @@ size_t YawDetector::size(QPair<long, long> pair){
 
 int YawDetector::yaw(QString filename){
 	int rot;
-	filename = filename.split("/").last();
+	filename = filename.split("/").last(); //TODO kan dit niet mooier met fileInfo?
 	if(filename.contains("YR")){
 		int index = filename.lastIndexOf("YR")+3;
 		rot = filename.mid(index+1, 2).toInt();
