@@ -52,7 +52,7 @@ cv::vector<double> PitchDetector::detectFeatures(Mat image){
 		features[8] = nose.at(0).x+nose.at(0).size().width/2;
 		features[9] = nose.at(0).y+nose.at(0).size().height/2;
 	} catch(std::exception e) {
-		std::cerr << "Error " << e.what() << std::endl;
+//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
 	}
 
 	return features;
@@ -83,11 +83,12 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 			vector<double> features = detectFeatures(im);
 			long realPitch = PitchDetector::pitch(imagePath);
 
-			double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
+//			double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
+			double div = distanceMouthNose(features, im)/distanceNoseEye(features, im);
 
 			std::cout << "Detect " << image.toStdString();
-			std::cout << "\t" << diff << std::endl;
-			result[imagePath]= qMakePair(realPitch, diff);
+			std::cout << "\t" << div << std::endl;
+			result[imagePath]= qMakePair(realPitch, div);
 		}
 	}
 }
@@ -107,6 +108,18 @@ bool containsTies(QVector<long> vec){
 	return (vec.count(max) > 1) ? true : false;
 }
 
+double PitchDetector::diffFromFile(QString filename){
+	QFileInfo info1(filename);
+	auto allPositions = deserialize();
+	auto keys = allPositions.keys();
+	for(int i=0; i<keys.count(); ++i){
+		QFileInfo info2(keys.at(i));
+		if(info1.fileName() == info2.fileName()){
+			return allPositions[keys.at(i)].second;
+		}
+	}
+}
+
 QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 	QMap<long, QVector<float> > result;
 
@@ -116,9 +129,10 @@ QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 		result[pair.first].push_back(pair.second);
 	}
 
-	Mat im = imread(filename.toStdString());
-	auto features = detectFeatures(im);
-	double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
+//	Mat im = imread(filename.toStdString());
+//	auto features = detectFeatures(im);
+//	double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
+	double diff = diffFromFile(filename);
 
 	auto keys = result.keys();
 	QVector<long> support(keys.count(), 0);
@@ -138,8 +152,8 @@ QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 long PitchDetector::operator()(QString filename, double fuzziness){
 	auto support = detectPitch(filename, fuzziness);
 	int counter = 0;
-	while(containsTies(support) && counter < 10){
-		std::cout << "Tie" << std::endl;
+	while(containsTies(support) && counter < 50){
+//		std::cout << "Tie" << std::endl; //TODO dit mag later weg
 		++counter;
 		fuzziness -= 0.0001;
 		support = detectPitch(filename, fuzziness);
@@ -174,7 +188,7 @@ long PitchDetector::pitch(QString filename){
 }
 
 void PitchDetector::serialize(QMap<QString, QPair<long, double> > result){
-	QFile file("positionsPitch");
+	QFile file("positionsPitchDiv");
 	if(file.open(QIODevice::WriteOnly)){
 		QTextStream stream(&file);
 
@@ -192,7 +206,7 @@ void PitchDetector::serialize(QMap<QString, QPair<long, double> > result){
 QMap<QString, QPair<long, double> > PitchDetector::deserialize(){
 	QMap<QString, QPair<long, double> > result;
 
-	QFile file("positionsPitch");
+	QFile file("positionsPitchDiv");
 	if(file.open(QIODevice::ReadOnly)){
 		QTextStream stream(&file);
 

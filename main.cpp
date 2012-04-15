@@ -8,6 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 using namespace cv;
+double param = 0.005;
 
 void crossValidateYaw(){
 	unsigned long correct = 0;
@@ -39,29 +40,34 @@ void crossValidateYaw(){
 }
 
 void crossValidatePitch(){
-	PitchDetector pd(false);
-	QStringList subdirs = QDir("../HeadPoseEstimation/data/").entryList();
-	auto last = std::remove_if(subdirs.begin(), subdirs.end(), [](QString s){return !s.startsWith("bs");});
+	QString base = "/home/jonas/Qt/HeadPoseEstimation/data";
+	QString extendedBase = base + "/" + "bs0";
 
-for(auto elem=subdirs.begin(); elem != last; ++elem){
-	QDir imageDir("../HeadPoseEstimation/data/" + *(elem));
-	QStringList images = imageDir.entryList(QStringList("*.png"));
-	foreach(QString image, images){
-		QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
-		if(!image.contains("YR")){
-			std::cout << "Test " << image.toStdString() << std::endl;
-			pd(imagePath, double(0.001));
-			std::cout << std::endl;
+	for(unsigned long i=0; i<20; ++i){
+		QString imageDir = extendedBase + QString("%1").arg(i, 2, 10, QChar('0'));
+		QStringList images = QDir(imageDir).entryList(QStringList("*.png"));
+		foreach(QString image, images){
+			if(!image.contains("YR")){
+				std::cout << "Test " << image.toStdString() << std::endl;
+				PitchDetector pd(imageDir);
+				pd(imageDir + "/" + image, param);
+				std::cout << std::endl;
+			}
 		}
 	}
-}
 }
 
 int main(int argc, char *argv[]) {
 	//	YawDetector yd(true); //train the yawdetector
-	//	crossValidateYaw();
+		crossValidateYaw();
 
-//		PitchDetector pd(true); //train the pitchdetector
-	crossValidatePitch();
+		PitchDetector pd(true); //train the pitchdetector
+//	if(argc > 1){
+//		param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde
+//	}
+
+//	std::cout << param << std::endl;
+//	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
+//	crossValidatePitch();
 	return 0;
 }

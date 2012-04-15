@@ -23,6 +23,7 @@ private:
 	QVector<long> detectPitch(QString filename, double fuzziness);
 	void serialize(QMap<QString, QPair<long, double> > result);
 	QMap<QString, QPair<long, double> > deserialize();
+	double diffFromFile(QString filename);
 };
 
 #endif // PITCHDETECTOR_H
