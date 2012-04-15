@@ -21,6 +21,7 @@ def sum(dic):
 		result += v
 	return result
 
+distance = [0 for i in range(0,5)]
 correct = emptyDic()
 totals = emptyDic()
 dic = {"D":-2, "SD":-1, "SU":1, "U":2}
@@ -52,6 +53,8 @@ for line in f:
 		if len(maxList) == 1:
 			if maxList[0] == expected:
 				correct[expected] += 1
+			dist = abs(expected-maxList[0])
+			distance[dist] += 1
 		else:
 			#print(expected,"->",maxList)
 			totalTies += 1
@@ -63,5 +66,6 @@ for line in f:
 #print("Correct normalized distribution:", div(correct, totals))
 #print("Sum total", sum(totals))
 #print("Sum correct", sum(correct))
-#print(sum(correct)/sum(totals))
-print("Ties", totalTies, correctTies)
+print(sum(correct)/sum(totals), end="\t")
+#print("Ties", totalTies, correctTie)
+print("Distances", distance)
