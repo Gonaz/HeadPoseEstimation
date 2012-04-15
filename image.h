@@ -4,6 +4,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 #include <iostream> //TODO debug
+#include <QString>
 
 class Image{
 public:
@@ -13,12 +14,38 @@ public:
 		return center/double(image.cols)*100;
 	}
 
+	static cv::Rect getLeftEye(cv::vector<cv::Rect> v){ //TODO duplicate code with getRightEye
+		if(v.size() == 0){
+			throw std::exception();
+			return cv::Rect(-1, -1, -1, -1);
+		} else if(v.size() == 1){
+			throw std::exception();
+			return v.at(0);
+		} else {
+			assert(v.size() == 2); //TODO debug
+			return (v.at(0).x < v.at(1).x) ? v.at(0) : v.at(1);
+		}
+	}
+
+	static cv::Rect getRightEye(cv::vector<cv::Rect> v){ //TODO duplicate code with getLeftEye
+		if(v.size() == 0){
+			throw std::exception();
+			return cv::Rect(-1, -1, -1, -1);
+		} else if(v.size() == 1){
+			throw std::exception();
+			return v.at(0);
+		} else {
+			assert(v.size() == 2); //TODO debug
+			return (v.at(0).x > v.at(1).x) ? v.at(0) : v.at(1);
+		}
+	}
+
+
 	static cv::vector<cv::Rect> detectEyes(cv::Mat image){
 		//TODO adaptive resize
 		double scale = 0.4;
 		double iScale = 1/scale;
 		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
-//		cv::GaussianBlur(image, image, cv::Size(7,7), 0);
 		cv::vector<cv::Rect> eyes = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml", 2);
 		if(eyes.size() > 1){
 			if(eyes.at(0).tl().y > eyes.at(1).br().y){
@@ -57,6 +84,28 @@ public:
 		}
 
 		return mouth;
+	}
+
+	static cv::vector<cv::Rect> detectNose(cv::Mat image){
+		//TODO adaptive resize
+		double scale = 0.4;
+		double iScale = 1/scale;
+		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
+		cv::vector<cv::Rect> nose = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_nose.xml", 1);
+
+//		for(auto it=mouth.begin(); it != mouth.end(); ++it){
+//			if((*it).tl().y < image.rows/2){
+//				mouth.erase(it--);
+//			}
+//		}
+
+		for(size_t i=0; i<nose.size(); ++i){
+			cv::Rect r = nose.at(i);
+			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
+			nose.at(i) = newR;
+		}
+
+		return nose;
 	}
 
 	static cv::vector<cv::Rect> detect(cv::Mat image, QString file, size_t amount){

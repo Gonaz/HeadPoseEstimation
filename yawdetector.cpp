@@ -28,7 +28,7 @@ YawDetector::YawDetector(QString retainDir){
 	}
 }
 
-long YawDetector::operator ()(QString image){
+long YawDetector::operator()(QString image){
 	Mat image1 = imread(image.toStdString());
 	vector<Rect> eyes1 = Image::detectEyes(image1);
 	long position1 = 0;
@@ -68,9 +68,6 @@ long YawDetector::operator ()(QString image){
 		scores.remove(key);
 	}
 
-	int i = 200;
-	std::cout << getBest(scores, i).first << getBest(scores, i).second.toStdString() << std::endl;
-
 	return yaw(getBest(scores).second);
 }
 
@@ -101,7 +98,7 @@ QMap<QString, QPair<long, long> > YawDetector::calculateRelativePositions() {
 }
 
 void YawDetector::serialize(QMap<QString, QPair<long, long> > positions){
-	QFile file("positions");
+	QFile file("positionsYaw");
 	if(file.open(QIODevice::WriteOnly)){
 		QTextStream stream(&file);
 
@@ -119,7 +116,7 @@ void YawDetector::serialize(QMap<QString, QPair<long, long> > positions){
 QMap<QString, QPair<long, long> > YawDetector::deserialize(){
 	QMap<QString, QPair<long, long> > result;
 
-	QFile file("positions");
+	QFile file("positionsYaw");
 	if(file.open(QIODevice::ReadOnly)){
 		QTextStream stream(&file);
 
