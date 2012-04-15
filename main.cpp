@@ -57,17 +57,25 @@ void crossValidatePitch(){
 	}
 }
 
+/* TODO
+	adaptive resize in image
+	nose, mouth, eye detectie constraints opleggen
+	=> positie van features zou overal bekend moeten zijn
+	de yaw detector laten werken op de file -> sneller (cf. pitch detector)
+	de pitch detector de pitch laten teruggeven
+*/
+
 int main(int argc, char *argv[]) {
 	//	YawDetector yd(true); //train the yawdetector
-		crossValidateYaw();
+	//		crossValidateYaw(); // 171/245 met absolute error = 19.53
 
-		PitchDetector pd(true); //train the pitchdetector
-//	if(argc > 1){
-//		param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde
-//	}
+	//		PitchDetector pd(true); //train the pitchdetector
+	if(argc > 1){
+		param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde voor diff, voor div 0.14
+	}
 
-//	std::cout << param << std::endl;
-//	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
-//	crossValidatePitch();
+	std::cout << param << std::endl;
+	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
+	crossValidatePitch();
 	return 0;
 }

@@ -93,12 +93,6 @@ public:
 		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
 		cv::vector<cv::Rect> nose = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_nose.xml", 1);
 
-//		for(auto it=mouth.begin(); it != mouth.end(); ++it){
-//			if((*it).tl().y < image.rows/2){
-//				mouth.erase(it--);
-//			}
-//		}
-
 		for(size_t i=0; i<nose.size(); ++i){
 			cv::Rect r = nose.at(i);
 			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
