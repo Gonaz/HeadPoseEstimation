@@ -11,18 +11,18 @@ class PitchDetector {
 public:
 	PitchDetector(bool train);
 	PitchDetector(QString retainDir);
-	long operator()(QString filename, float fuziness=0.001);
+	long operator()(QString filename, double fuziness=0.001);
 	static long pitch(QString filename);
 private:
-	QMap<long, QVector<float> > positions;
+	QMap<QString, QPair<long, double> > positions;
 
-	cv::vector<float> detectFeatures(cv::Mat image);
-	double distanceMouthNose(cv::vector<float> features, cv::Mat image);
-	double distanceNoseEye(cv::vector<float> features, cv::Mat image);
-	QMap<long, QVector<float> > calculateRelativePositions();
-	QVector<long> test(QString filename, float fuzziness);
-	void serialize(QMap<long, QVector<float> > result);
-	QMap<long, QVector<float> > deserialize();
+	cv::vector<double> detectFeatures(cv::Mat image);
+	double distanceMouthNose(cv::vector<double> features, cv::Mat image);
+	double distanceNoseEye(cv::vector<double> features, cv::Mat image);
+	QMap<QString, QPair<long, double> > calculateRelativePositions();
+	QVector<long> detectPitch(QString filename, double fuzziness);
+	void serialize(QMap<QString, QPair<long, double> > result);
+	QMap<QString, QPair<long, double> > deserialize();
 };
 
 #endif // PITCHDETECTOR_H

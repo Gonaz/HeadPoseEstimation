@@ -50,7 +50,7 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 		QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
 		if(!image.contains("YR")){
 			std::cout << "Test " << image.toStdString() << std::endl;
-			pd(imagePath, 0.001);
+			pd(imagePath, double(0.001));
 			std::cout << std::endl;
 		}
 	}
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 	//	YawDetector yd(true); //train the yawdetector
 	//	crossValidateYaw();
 
-	//	PitchDetector pd(true); //train the pitchdetector
+//		PitchDetector pd(true); //train the pitchdetector
 	crossValidatePitch();
 	return 0;
 }
