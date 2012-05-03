@@ -5,12 +5,14 @@
 #include <QMap>
 #include <QPair>
 #include <QStringList>
+#include <QVector>
 
 class YawDetector {
 public:
 	YawDetector(bool train);
 	YawDetector(QString retainDir);
 	long operator()(QString image);
+	long newDetect(QString filename, double fuzziness);
 	static int yaw(QString filename);
 private:
 	QMap<QString, QPair<long, long> > positions;
@@ -21,6 +23,10 @@ private:
 	size_t size(QPair<long, long> pair);
 	void serialize(QMap<QString, QPair<long, long> > positions);
 	QMap<QString, QPair<long, long> > deserialize();
+	QPair<long, long> positionsFromFile(QString filename);
+
+	QVector<long> detectYaw(QString filename, double fuzziness);
+	bool containsTies(QVector<long> vec);
 };
 
 #endif // YAWDETECTOR_H

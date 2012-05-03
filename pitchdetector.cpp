@@ -1,5 +1,6 @@
 #include "pitchdetector.h"
 #include "image.h"
+#include "landmarkreader.h"
 #include <QStringList>
 #include <QDir>
 #include <QFile>
@@ -28,6 +29,33 @@ PitchDetector::PitchDetector(QString retainDir){
 			positions.remove(keys.at(i));
 		}
 	}
+}
+
+cv::vector<double> PitchDetector::readFeatures(QString filename){
+	filename.replace(".png", ".lm2");
+	LandMarkReader lmr = LandMarkReader(filename);
+	vector<double> features(10);
+
+	try{
+		features[0] = lmr.leftEyeCorner().first;
+		features[1] = lmr.leftEyeCorner().second;
+
+		features[2] = lmr.rightEyeCorner().first;
+		features[3] = lmr.rightEyeCorner().second;
+
+		features[4] = lmr.mouthLeftCorner().first;
+		features[5] = lmr.mouthLeftCorner().second;
+
+		features[6] = lmr.mouthRightCorner().first;
+		features[7] = lmr.mouthLeftCorner().second;
+
+		features[8] = lmr.nose().first;
+		features[9] = lmr.nose().second;
+	} catch(std::exception e) {
+//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
+	}
+
+	return features;
 }
 
 cv::vector<double> PitchDetector::detectFeatures(Mat image){
@@ -80,7 +108,8 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 		QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
 		if(!image.contains("YR")){
 			Mat im = imread(imagePath.toStdString());
-			vector<double> features = detectFeatures(im);
+			vector<double> features = readFeatures(imagePath);
+			//vector<double> features = detectFeatures(im);
 			long realPitch = PitchDetector::pitch(imagePath);
 
 //			double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
@@ -96,7 +125,7 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 return result;
 }
 
-bool containsTies(QVector<long> vec){
+bool PitchDetector::containsTies(QVector<long> vec){
 	int max = 0;
 
 	foreach(long v, vec){
@@ -201,7 +230,7 @@ long PitchDetector::pitch(QString filename){
 }
 
 void PitchDetector::serialize(QMap<QString, QPair<long, double> > result){
-	QFile file("positionsPitchDiv");
+	QFile file("positionsPitchOrig");
 	if(file.open(QIODevice::WriteOnly)){
 		QTextStream stream(&file);
 
@@ -219,7 +248,7 @@ void PitchDetector::serialize(QMap<QString, QPair<long, double> > result){
 QMap<QString, QPair<long, double> > PitchDetector::deserialize(){
 	QMap<QString, QPair<long, double> > result;
 
-	QFile file("positionsPitchDiv");
+	QFile file("positionsPitchOrig");
 	if(file.open(QIODevice::ReadOnly)){
 		QTextStream stream(&file);
 

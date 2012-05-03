@@ -17,6 +17,7 @@ private:
 	QMap<QString, QPair<long, double> > positions;
 
 	cv::vector<double> detectFeatures(cv::Mat image);
+	cv::vector<double> readFeatures(QString filename);
 	double distanceMouthNose(cv::vector<double> features, cv::Mat image);
 	double distanceNoseEye(cv::vector<double> features, cv::Mat image);
 	QMap<QString, QPair<long, double> > calculateRelativePositions();
@@ -24,6 +25,7 @@ private:
 	void serialize(QMap<QString, QPair<long, double> > result);
 	QMap<QString, QPair<long, double> > deserialize();
 	double diffFromFile(QString filename);
+	bool containsTies(QVector<long> vec);
 };
 
 #endif // PITCHDETECTOR_H

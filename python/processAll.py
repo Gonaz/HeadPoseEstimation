@@ -67,5 +67,5 @@ for line in f:
 #print("Sum total", sum(totals))
 #print("Sum correct", sum(correct))
 print(sum(correct)/sum(totals), end="\t")
-#print("Ties", totalTies, correctTie)
+print("Ties", totalTies, correctTies, end="\t")
 print("Distances", distance)

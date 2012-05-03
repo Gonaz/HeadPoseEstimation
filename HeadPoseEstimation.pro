@@ -13,12 +13,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     yawdetector.cpp \
-    pitchdetector.cpp
+    pitchdetector.cpp \
+    landmarkreader.cpp
 
 HEADERS  += \
     yawdetector.h \
     image.h \
-    pitchdetector.h
+    pitchdetector.h \
+    landmarkreader.h
 
 FORMS    +=
 
