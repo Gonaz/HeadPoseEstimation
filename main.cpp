@@ -1,4 +1,5 @@
 #include "yawdetector.h"
+#include "yawtrainer.h"
 #include "pitchdetector.h"
 #include <QDir>
 #include <opencv2/core/core.hpp>
@@ -11,36 +12,44 @@
 using namespace cv;
 double param = 0.005;
 
-void crossValidateYaw(){
+void crossValidateYaw(QString positionsFile){
 	unsigned long correct = 0;
 	unsigned long wrong = 0;
 	unsigned long error = 0;
+	unsigned long wrongDirection = 0;
 
 	QString base = "../HeadPoseEstimation/data";
 	QString extendedBase = base + "/" + "bs0";
 	for(unsigned long i=0; i<20; ++i){
 		QString imageDir = extendedBase + QString("%1").arg(i, 2, 10, QChar('0'));
 		QStringList images = QDir(imageDir).entryList(QStringList("*.png"));
+		unsigned long correctDir = 0;
+		unsigned long wrongDir = 0;
 		foreach(QString image, images){
-			std::cout << "Test " << image.toStdString() << std::endl;
-			YawDetector yd(imageDir);
-			yd.useLandmarks();
+			//			std::cout << "Test " << image.toStdString() << std::endl;
+			YawDetector yd = YawDetector(positionsFile).retainDir(imageDir);
 			int detectedYaw = yd(imageDir + "/" + image);
-//			int detectedYaw = yd.newDetect(imageDir + "/" + image, param);
 			int realYaw = yd.yaw(image);
 			if(detectedYaw != realYaw){
 				++wrong;
+				++wrongDir;
 				error += abs(detectedYaw - realYaw);
+				if(detectedYaw*realYaw < 0){
+					++wrongDirection;
+//					std::cout << image.toStdString() << std::endl;
+					std::cout << realYaw << " -> " << detectedYaw << std::endl;
+				}
 			} else {
 				++correct;
+				++correctDir;
 			}
-			//			std::cout << "Estimation " << detectedYaw << "\t Real " << realYaw << std::endl;
-			std::cout << std::endl;
 		}
+//		std::cout << imageDir.toStdString() << " -> " << correctDir << "/" << (correctDir + wrongDir) << std::endl;
 	}
 
 	std::cout << correct << "/" << (correct+wrong) << std::endl;
 	std::cout << "Average absolute error " << (error/double(correct+wrong)) << std::endl;
+	std::cout << "Wrong directions " << wrongDirection << std::endl;
 }
 
 void crossValidatePitch(){
@@ -61,25 +70,50 @@ void crossValidatePitch(){
 	}
 }
 
+void test(){
+	QString filename = "/home/jonas/Qt/HeadPoseEstimation/data/bs000/bs000_YR_L90_0.png";
+	Mat image = imread(filename.toStdString());
+	vector<Rect> eyes = Image::detectEyes(image);
+	rectangle(image, eyes.at(0), Scalar(0,200,0), 3);
+
+	filename.replace(".png", ".lm2");
+	LandMarkReader lmr(filename);
+	auto leftOuter = lmr.leftEyeCorner();
+	auto leftInner = lmr.innerLeftEyeCorner();
+	auto rightOuter = lmr.rightEyeCorner();
+	auto rightInner = lmr.innerRightEyeCorner();
+
+	circle(image, Point(leftOuter.first, leftOuter.second), 5, Scalar(200, 0, 0), 3);
+//	circle(image, Point(leftInner.first, leftInner.second), 5, Scalar(200, 0, 0), 3);
+//	circle(image, Point(rightOuter.first, rightOuter.second), 5, Scalar(200, 0, 0), 3);
+//	circle(image, Point(rightInner.first, rightInner.second), 5, Scalar(200, 0, 0), 3);
+
+	resize(image, image, Size(image.cols*0.6, image.rows*0.6));
+	imshow("Bla", image);
+	waitKey();
+}
+
 /* TODO
 	adaptive resize in image
 	nose, mouth, eye detectie constraints opleggen
 	=> positie van features zou overal bekend moeten zijn
-	de yaw detector laten werken op de file -> sneller (cf. pitch detector)
 	de pitch detector de pitch laten teruggeven
 */
 
 int main(int argc, char *argv[]) {
-//		YawDetector yd(true); //train the yawdetector
-		crossValidateYaw(); // 171/245 met absolute error = 19.5306; orig 187/244 met absolute error = 8.68852
+//	test();
+//	YawTrainer yt = false;
+//	yt();
+	crossValidateYaw("positionsYaw"); // 199/244 met absolute error = 8.81148 (3 wrong directions)
+	crossValidateYaw("positionsYawOrig"); // 228/244 met absolute error = 2.2541 (2 wrong directions)
 
-//	if(argc > 1){
-//		param = QString(argv[1]).toDouble();
-//	}
+	//	if(argc > 1){
+	//		param = QString(argv[1]).toDouble();
+	//	}
 
-//	std::cout << param << std::endl;
-//	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
-//	crossValidateYaw();
+	//	std::cout << param << std::endl;
+	//	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
+	//	crossValidateYaw();
 
 	//		PitchDetector pd(true); //train the pitchdetector
 

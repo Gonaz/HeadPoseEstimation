@@ -42,25 +42,28 @@ public:
 
 
 	static cv::vector<cv::Rect> detectEyes(cv::Mat image){
-		//TODO adaptive resize
-		double scale = 0.4;
-		double iScale = 1/scale;
-		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
-		cv::vector<cv::Rect> eyes = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml", 2);
-		if(eyes.size() > 1){
-			if(eyes.at(0).tl().y > eyes.at(1).br().y){
-				eyes.erase(eyes.begin());
-			} else if(eyes.at(1).tl().y > eyes.at(0).br().y ){
-				eyes.erase(eyes.end());
+		cv::vector<cv::Rect> eyes;
+		double scale = 0.2;
+		while(eyes.size() == 0 && scale < 1){
+			double iScale = 1/scale;
+			cv::Mat image2;
+			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
+			eyes = detect(image2, "/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml", 2);
+			if(eyes.size() > 1){
+				if(eyes.at(0).tl().y > eyes.at(1).br().y){
+					eyes.erase(eyes.begin());
+				} else if(eyes.at(1).tl().y > eyes.at(0).br().y ){
+					eyes.erase(eyes.end());
+				}
 			}
-		}
 
-		for(size_t i=0; i<eyes.size(); ++i){
-			cv::Rect r = eyes.at(i);
-			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
-			eyes.at(i) = newR;
+			for(size_t i=0; i<eyes.size(); ++i){
+				cv::Rect r = eyes.at(i);
+				cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
+				eyes.at(i) = newR;
+			}
+			scale += 0.1;
 		}
-
 		return eyes;
 	}
 
