@@ -24,8 +24,9 @@ void crossValidateYaw(){
 		foreach(QString image, images){
 			std::cout << "Test " << image.toStdString() << std::endl;
 			YawDetector yd(imageDir);
-			//			int detectedYaw = yd(imageDir + "/" + image);
-			int detectedYaw = yd.newDetect(imageDir + "/" + image, param);
+			yd.useLandmarks();
+			int detectedYaw = yd(imageDir + "/" + image);
+//			int detectedYaw = yd.newDetect(imageDir + "/" + image, param);
 			int realYaw = yd.yaw(image);
 			if(detectedYaw != realYaw){
 				++wrong;
@@ -38,8 +39,8 @@ void crossValidateYaw(){
 		}
 	}
 
-	//	std::cout << correct << "/" << (correct+wrong) << std::endl;
-	//	std::cout << "Average absolute error " << (error/double(correct+wrong)) << std::endl;
+	std::cout << correct << "/" << (correct+wrong) << std::endl;
+	std::cout << "Average absolute error " << (error/double(correct+wrong)) << std::endl;
 }
 
 void crossValidatePitch(){
@@ -69,25 +70,25 @@ void crossValidatePitch(){
 */
 
 int main(int argc, char *argv[]) {
-	//	YawDetector yd(true); //train the yawdetector
-	//	crossValidateYaw(); // 171/245 met absolute error = 19.5306; orig 187/244 met absolute error = 8.68852
+//		YawDetector yd(true); //train the yawdetector
+		crossValidateYaw(); // 171/245 met absolute error = 19.5306; orig 187/244 met absolute error = 8.68852
 
-	//		if(argc > 1){
-	//			param = QString(argv[1]).toDouble();
-	//		}
+//	if(argc > 1){
+//		param = QString(argv[1]).toDouble();
+//	}
 
-	//		std::cout << param << std::endl;
-	//		std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
-	//		crossValidateYaw();
+//	std::cout << param << std::endl;
+//	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
+//	crossValidateYaw();
 
 	//		PitchDetector pd(true); //train the pitchdetector
 
-	if(argc > 1){
-		param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde voor diff, voor div 0.14
-	}
+	//	if(argc > 1){
+	//		param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde voor diff, voor div 0.14
+	//	}
 
-	std::cout << param << std::endl;
-	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
-	crossValidatePitch();
+	//	std::cout << param << std::endl;
+	//	std::cout << "Starting /home/jonas/Qt/HeadPoseEstimation-Debug/HeadPoseEstimation..." << std::endl;
+	//	crossValidatePitch();
 	return 0;
 }

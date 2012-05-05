@@ -11,6 +11,8 @@
 using namespace cv;
 
 YawDetector::YawDetector(bool train){
+	positionFile = "positionsYaw";
+	landmarks = false;
 	if(train){
 		positions = calculateRelativePositions();
 		serialize(positions);
@@ -20,6 +22,8 @@ YawDetector::YawDetector(bool train){
 }
 
 YawDetector::YawDetector(QString retainDir){
+	positionFile = "positionsYaw";
+	landmarks = false;
 	positions = deserialize();
 	auto keys = positions.keys();
 	for(int i=0; i<keys.count(); ++i){
@@ -117,7 +121,6 @@ long YawDetector::newDetect(QString filename, double fuzziness){
 }
 
 long YawDetector::operator()(QString image){
-	std::cout << "First " << positionsFromFile(image).first << " Second " << positionsFromFile(image).second << std::endl;
 	long eyes1Size = size(positionsFromFile(image));
 	long position1 = positionsFromFile(image).first + positionsFromFile(image).second;
 
@@ -165,27 +168,30 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 	foreach(QString image, images){
 		QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
 		Mat image = imread(imagePath.toStdString());
-//		vector<Rect> eyes = Image::detectEyes(image);
-//		if(eyes.size() == 0){
-//			result.insert(imagePath, qMakePair(0, 0));
-//		} else if(eyes.size() == 1){
-//			result.insert(imagePath, qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), 0));
-//		} else {
-//			result.insert(imagePath, qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1))));
-//		}
-		QString landmarksPath(imagePath);
-		landmarksPath.replace(".png", ".lm2");
-		std::cout << "Detect " << imagePath.toStdString() << std::endl;
-		LandMarkReader lmr = LandMarkReader(landmarksPath);
-		long leftOuter = lmr.leftEyeCorner().first;
-		long leftInner = lmr.innerLeftEyeCorner().first;
-		long rightOuter = lmr.rightEyeCorner().first;
-		long rightInner = lmr.innerRightEyeCorner().first;
+		if(!landmarks){
+			vector<Rect> eyes = Image::detectEyes(image);
+			if(eyes.size() == 0){
+				result.insert(imagePath, qMakePair(long(0), long(0)));
+			} else if(eyes.size() == 1){
+				result.insert(imagePath, qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), long(0)));
+			} else {
+				result.insert(imagePath, qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1))));
+			}
+		} else {
+			QString landmarksPath(imagePath);
+			landmarksPath.replace(".png", ".lm2");
+			std::cout << "Detect " << imagePath.toStdString() << std::endl;
+			LandMarkReader lmr = LandMarkReader(landmarksPath);
+			long leftOuter = lmr.leftEyeCorner().first;
+			long leftInner = lmr.innerLeftEyeCorner().first;
+			long rightOuter = lmr.rightEyeCorner().first;
+			long rightInner = lmr.innerRightEyeCorner().first;
 
-		long left = (leftOuter + leftInner)/2/double(image.cols)*100;
-		long right = (rightOuter + rightInner)/2/double(image.cols)*100;
+			long left = (leftOuter + leftInner)/2/double(image.cols)*100;
+			long right = (rightOuter + rightInner)/2/double(image.cols)*100;
 
-		result.insert(imagePath, qMakePair(left, right));
+			result.insert(imagePath, qMakePair(left, right));
+		}
 	}
 }
 
@@ -193,7 +199,7 @@ return result;
 }
 
 void YawDetector::serialize(QMap<QString, QPair<long, long> > positions){
-	QFile file("positionsYawOrig");
+	QFile file(positionFile);
 	if(file.open(QIODevice::WriteOnly)){
 		QTextStream stream(&file);
 
@@ -215,7 +221,7 @@ void YawDetector::serialize(QMap<QString, QPair<long, long> > positions){
 QMap<QString, QPair<long, long> > YawDetector::deserialize(){
 	QMap<QString, QPair<long, long> > result;
 
-	QFile file("positionsYawOrig");
+	QFile file(positionFile);
 	if(file.open(QIODevice::ReadOnly)){
 		QTextStream stream(&file);
 
@@ -266,4 +272,9 @@ QPair<long, long> YawDetector::positionsFromFile(QString filename){
 			return allPositions[keys.at(i)];
 		}
 	}
+}
+
+void YawDetector::useLandmarks(){
+	positionFile = "positionsYawOrig";
+	landmarks = true;
 }

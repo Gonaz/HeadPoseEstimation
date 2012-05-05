@@ -14,9 +14,12 @@ public:
 	long operator()(QString image);
 	long newDetect(QString filename, double fuzziness);
 	static int yaw(QString filename);
+	void useLandmarks();
 private:
 	QMap<QString, QPair<long, long> > positions;
 	static const unsigned long ONE_MILLION = 1000000;
+	QString positionFile;
+	bool landmarks;
 
 	QMap<QString, QPair<long, long> > calculateRelativePositions();
 	QPair<long, QString> getBest(QMultiMap<long, QString> scores, int number=0);
