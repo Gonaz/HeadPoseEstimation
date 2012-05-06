@@ -3,6 +3,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/highgui/highgui.hpp> //TODO debug
 #include <iostream> //TODO debug
 #include <QString>
 
@@ -44,7 +45,7 @@ public:
 	static cv::vector<cv::Rect> detectEyes(cv::Mat image){
 		cv::vector<cv::Rect> eyes;
 		double scale = 0.2;
-		while(eyes.size() == 0 && scale < 1){
+		while(eyes.size() == 0 && scale <= 1){
 			double iScale = 1/scale;
 			cv::Mat image2;
 			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
@@ -54,6 +55,25 @@ public:
 					eyes.erase(eyes.begin());
 				} else if(eyes.at(1).tl().y > eyes.at(0).br().y ){
 					eyes.erase(eyes.end());
+				}
+				if(eyes.size() > 1){
+					if (eyes.at(0).tl().x < eyes.at(1).br().x && eyes.at(0).br().x > eyes.at(1).tl().x && eyes.at(0).tl().y < eyes.at(1).br().y && eyes.at(0).br().y > eyes.at(1).tl().y){
+						std::cout << "Double" << std::endl;
+//						cv::Mat imageSmall;
+//						image.copyTo(imageSmall);
+//						cv::resize(imageSmall, imageSmall, cv::Size(imageSmall.cols*scale, imageSmall.rows*scale));
+//						cv::rectangle(imageSmall, eyes.at(0), cv::Scalar(0, 200, 0), 3);
+//						cv::rectangle(imageSmall, eyes.at(1), cv::Scalar(0, 0, 200), 3);
+//						cv::imshow("Double", imageSmall);
+//						cv::waitKey();
+						int area1 = eyes.at(0).area();
+						int area2 = eyes.at(1).area();
+						if(area1 > area2){
+							eyes.erase(eyes.begin());
+						} else {
+							eyes.erase(eyes.end());
+						}
+					}
 				}
 			}
 

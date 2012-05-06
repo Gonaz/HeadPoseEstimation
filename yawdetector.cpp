@@ -50,10 +50,10 @@ long YawDetector::operator()(QString image){
 			if(eyes1Size == 0){
 				score = 1;
 			} else if(eyes1Size == 1){
-				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){
+				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){ //TODO eerste case zou niet mogen voorkomen
 					score = (position1 - position2);
 				} else {
-					score = ONE_MILLION;
+					score = ONE_MILLION; //TODO dit kan ook enkel voorkomen wanneer volgorde belangrijk is
 				}
 			} else {
 				score = (position1 - position2);
@@ -63,7 +63,7 @@ long YawDetector::operator()(QString image){
 		scores.insertMulti(std::abs(score), image);
 	}
 
-	return yaw(getBest(scores).second);
+	return getYawOfBest(scores);
 }
 
 QMap<QString, QPair<long, long> > YawDetector::deserialize(){
@@ -88,10 +88,9 @@ QMap<QString, QPair<long, long> > YawDetector::deserialize(){
 	return result;
 }
 
-QPair<long, QString> YawDetector::getBest(QMultiMap<long, QString> scores, int number){
+long YawDetector::getYawOfBest(QMultiMap<long, QString> scores, int number){
 	QList<long> keys = scores.keys();
-	qSort(keys.begin(), keys.end()); //TODO betere sorteer methode?
-	//--------------------------------------------------------------------------------------------
+	qSort(keys.begin(), keys.end());
 	QStringList hits = scores.values(keys.at(number));
 	QMap<long, long> yaws;
 	foreach(QString hit, hits){
@@ -106,15 +105,7 @@ QPair<long, QString> YawDetector::getBest(QMultiMap<long, QString> scores, int n
 			detectedYaw = yaws.keys().at(i);
 		}
 	}
-	QString mostPopular;
-	foreach(QString hit, hits){
-		if(yaw(hit) == detectedYaw){
-			mostPopular = hit;
-		}
-	}
-	return qMakePair(keys.at(number), mostPopular);
-	//--------------------------------------------------------------------------------------------
-//	return qMakePair(keys.at(number), scores.value(keys.at(number)));
+	return detectedYaw;
 }
 
 int YawDetector::yaw(QString filename){

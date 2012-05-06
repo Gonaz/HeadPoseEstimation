@@ -37,8 +37,8 @@ void crossValidateYaw(QString positionsFile){
 				error += abs(detectedYaw - realYaw);
 				if(detectedYaw*realYaw < 0){
 					++wrongDirection;
-//					 std::cout << image.toStdString() << std::endl;
-//					 std::cout << realYaw << " -> " << detectedYaw << std::endl;
+					//					 std::cout << image.toStdString() << std::endl;
+					//					 std::cout << realYaw << " -> " << detectedYaw << std::endl;
 				}
 			} else {
 				++correct;
@@ -71,6 +71,20 @@ void crossValidatePitch(){
 	}
 }
 
+void test(){
+	QString filename = "../HeadPoseEstimation/data/bs000/bs000_YR_R90_0.png";
+	Mat image = imread(filename.toStdString());
+	vector<Rect> nose = Image::detectNose(image);
+	std::cout << nose.size() << std::endl;
+	if(nose.size() > 0){
+		rectangle(image, nose.at(0), Scalar(0, 200, 0), 3);
+
+		resize(image, image, Size(image.cols*0.6, image.rows*0.6));
+		imshow("Nose", image);
+		waitKey();
+	}
+}
+
 /* TODO
 	adaptive resize in image
 	nose, mouth, eye detectie constraints opleggen
@@ -79,15 +93,12 @@ void crossValidatePitch(){
 */
 
 int main(int argc, char *argv[]) {
-	//	test();
-	//	test2();
-	//		YawTrainer yt = true;
-	//		yt();
-			crossValidateYaw("positionsYaw"); // 199/244 met absolute error = 8.81148 (3 wrong directions)
-	// 198/244 met absolute error = 9.4877 (5 wrong directions)
-//	crossValidateYaw("positionsYawOrig"); // 228/244 met absolute error = 2.2541 (2 wrong directions)
-	// 218/244 met absolute error : 7.54098 (12 wrong directions)
-//			crossValidateYaw("positionsYawBetter");
+//	test();
+		YawTrainer yt = false;
+		yt();
+		crossValidateYaw("positionsYaw");
+	//	crossValidateYaw("positionsYawOrig");
+	//	crossValidateYaw("positionsYawBetter");
 
 	//	if(argc > 1){
 	//		param = QString(argv[1]).toDouble();

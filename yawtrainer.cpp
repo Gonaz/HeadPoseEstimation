@@ -8,6 +8,9 @@
 #include <iostream>
 #include <functional>
 
+#define logical 0
+#define sorted 0
+
 using namespace cv;
 
 YawTrainer::YawTrainer(bool landmarks) : landmarks(landmarks) {
@@ -16,8 +19,8 @@ YawTrainer::YawTrainer(bool landmarks) : landmarks(landmarks) {
 		positionFile = "positionsYawOrig";
 		positions = std::bind(&YawTrainer::readPositions, this, _1);
 	} else {
-		positionFile = "positionsYawBetter";
-		positions = std::bind(&YawTrainer::detectBetterPositions, this, _1);
+		positionFile = "positionsYaw";
+		positions = std::bind(&YawTrainer::detectPositions, this, _1);
 	}
 }
 
@@ -51,22 +54,19 @@ QPair<long, long> YawTrainer::detectPositions(QString imagePath){
 	if(eyes.size() == 0){
 		return qMakePair(long(0), long(0));
 	} else if(eyes.size() == 1){
-//---------------------------------------------------------------------------
-		return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), long(0));
-//		long position = Image::getRelativePositionEye(image, eyes.at(0));
-//		if(position < 50){
-//			return qMakePair(position, long(0));
-//		} else {
-//			return qMakePair(long(0), position);
-//		}
+		long value = Image::getRelativePositionEye(image, eyes.at(0));
+		if(value < 50){
+			return qMakePair(value, long(0));
+		} else {
+			return qMakePair(long(0), value);
+		}
+//		return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), long(0));
 	} else {
-//---------------------------------------------------------------------------
 		if(eyes.at(0).x > eyes.at(1).x){
 			return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1)));
 		} else {
 			return qMakePair(Image::getRelativePositionEye(image, eyes.at(1)), Image::getRelativePositionEye(image, eyes.at(0)));
 		}
-//		return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1)));
 	}
 }
 
@@ -182,35 +182,40 @@ QPair<long, long> YawTrainer::readPositions(QString imagePath){
 	long rightOuter = lmr.rightEyeCorner().first;
 	long rightInner = lmr.innerRightEyeCorner().first;
 
+#if logical
+	// TODO Dit zorg voor iets slechtere resultaten maar is logischer interpreteerbaar wanneer er maar 1 punt per oog beschikbaar is
+	long left = 0;
+	long right = 0;
+
+	if(leftOuter == 0 && leftInner != 0){
+		left = leftInner/double(image.cols)*100;
+	} else if (leftOuter != 0 && leftInner == 0){
+		left = leftOuter/double(image.cols)*100;
+	} else {
+		left = (leftOuter + leftInner)/2/double(image.cols)*100;
+	}
+
+	if(rightOuter == 0 && rightInner != 0){
+		right = rightInner/double(image.cols)*100;
+	} else if(rightOuter != 0 && rightInner == 0) {
+		right = rightOuter/double(image.cols)*100;
+	} else {
+		right = (rightOuter + rightInner)/2/double(image.cols)*100;
+	}
+#else //logical
 	long left = left = (leftOuter + leftInner)/2/double(image.cols)*100;
 	long right = (rightOuter + rightInner)/2/double(image.cols)*100;
+#endif //logical
 
-//	long left = 0;
-//	long right = 0;
-
-//	if(leftOuter == 0 && leftInner != 0){
-//		left = leftInner/double(image.cols)*100;
-//	} else if (leftOuter != 0 && leftInner == 0){
-//		left = leftOuter/double(image.cols)*100;
-//	} else {
-//		left = (leftOuter + leftInner)/2/double(image.cols)*100;
-//	}
-
-//	if(rightOuter == 0 && rightInner != 0){
-//		right = rightInner/double(image.cols)*100;
-//	} else if(rightOuter != 0 && rightInner == 0) {
-//		right = rightOuter/double(image.cols)*100;
-//	} else {
-//		right = (rightOuter + rightInner)/2/double(image.cols)*100;
-//	}
-
-//---------------------------------------------------------------------------
+#if sorted
 	if(left > right){
 		return qMakePair(left, right);
 	} else {
 		return qMakePair(right, left);
 	}
-//	return qMakePair(right, left);
+#else //sorted
+	return qMakePair(right, left);
+#endif //sorted
 }
 
 void YawTrainer::serialize(QMap<QString, QPair<long, long> > positions){
@@ -222,11 +227,7 @@ void YawTrainer::serialize(QMap<QString, QPair<long, long> > positions){
 			auto key = positions.keys().at(i);
 			auto value = positions.value(key);
 
-//			if(value.first > value.second){
-				stream << key << "\n" << value.first << "\n" << value.second << "\n";
-//			} else {
-//				stream << key << "\n" << value.second << "\n" << value.first << "\n";
-//			}
+			stream << key << "\n" << value.first << "\n" << value.second << "\n";
 		}
 	}
 

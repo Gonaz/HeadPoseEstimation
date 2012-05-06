@@ -20,7 +20,7 @@ private:
 	QString positionFile;
 
 	QMap<QString, QPair<long, long> > calculateRelativePositions();
-	QPair<long, QString> getBest(QMultiMap<long, QString> scores, int number=0);
+	long getYawOfBest(QMultiMap<long, QString> scores, int number=0);
 	size_t size(QPair<long, long> pair);
 	void serialize(QMap<QString, QPair<long, long> > positions);
 	QMap<QString, QPair<long, long> > deserialize();
