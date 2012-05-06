@@ -15,6 +15,7 @@ private:
 
 	QMap<QString, QPair<long, long> > calculateRelativePositions();
 	QPair<long, long> detectPositions(QString imagePath);
+	QPair<long, long> detectBetterPositions(QString imagePath);
 	QPair<long, long> readPositions(QString imagePath);
 	void serialize(QMap<QString, QPair<long, long> > positions);
 };

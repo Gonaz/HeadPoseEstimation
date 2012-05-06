@@ -91,7 +91,30 @@ QMap<QString, QPair<long, long> > YawDetector::deserialize(){
 QPair<long, QString> YawDetector::getBest(QMultiMap<long, QString> scores, int number){
 	QList<long> keys = scores.keys();
 	qSort(keys.begin(), keys.end()); //TODO betere sorteer methode?
-	return qMakePair(keys.at(number), scores.value(keys.at(number)));
+	//--------------------------------------------------------------------------------------------
+	QStringList hits = scores.values(keys.at(number));
+	QMap<long, long> yaws;
+	foreach(QString hit, hits){
+		++yaws[yaw(hit)];
+	}
+	int max = 0;
+	int detectedYaw = 0;
+	for(int i=0; i<yaws.keys().count(); ++i){
+		long value = yaws[yaws.keys().at(i)] ;
+		if(value > max){
+			max = value;
+			detectedYaw = yaws.keys().at(i);
+		}
+	}
+	QString mostPopular;
+	foreach(QString hit, hits){
+		if(yaw(hit) == detectedYaw){
+			mostPopular = hit;
+		}
+	}
+	return qMakePair(keys.at(number), mostPopular);
+	//--------------------------------------------------------------------------------------------
+//	return qMakePair(keys.at(number), scores.value(keys.at(number)));
 }
 
 int YawDetector::yaw(QString filename){
@@ -111,6 +134,8 @@ int YawDetector::yaw(QString filename){
 }
 
 QPair<long, long> YawDetector::positionsFromFile(QString filename){
+//	QString temp = positionFile;
+//	positionFile = "positionsYaw";
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
@@ -120,4 +145,5 @@ QPair<long, long> YawDetector::positionsFromFile(QString filename){
 			return allPositions[keys.at(i)];
 		}
 	}
+//	positionFile = temp;
 }

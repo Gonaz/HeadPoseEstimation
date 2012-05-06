@@ -8,6 +8,7 @@
 #include "image.h"
 #include "landmarkreader.h"
 #include <opencv2/highgui/highgui.hpp>
+#include <QTime>
 
 using namespace cv;
 double param = 0.005;
@@ -36,15 +37,15 @@ void crossValidateYaw(QString positionsFile){
 				error += abs(detectedYaw - realYaw);
 				if(detectedYaw*realYaw < 0){
 					++wrongDirection;
-//					std::cout << image.toStdString() << std::endl;
-					std::cout << realYaw << " -> " << detectedYaw << std::endl;
+//					 std::cout << image.toStdString() << std::endl;
+//					 std::cout << realYaw << " -> " << detectedYaw << std::endl;
 				}
 			} else {
 				++correct;
 				++correctDir;
 			}
 		}
-//		std::cout << imageDir.toStdString() << " -> " << correctDir << "/" << (correctDir + wrongDir) << std::endl;
+		//		std::cout << imageDir.toStdString() << " -> " << correctDir << "/" << (correctDir + wrongDir) << std::endl;
 	}
 
 	std::cout << correct << "/" << (correct+wrong) << std::endl;
@@ -70,29 +71,6 @@ void crossValidatePitch(){
 	}
 }
 
-void test(){
-	QString filename = "/home/jonas/Qt/HeadPoseEstimation/data/bs000/bs000_YR_L90_0.png";
-	Mat image = imread(filename.toStdString());
-	vector<Rect> eyes = Image::detectEyes(image);
-	rectangle(image, eyes.at(0), Scalar(0,200,0), 3);
-
-	filename.replace(".png", ".lm2");
-	LandMarkReader lmr(filename);
-	auto leftOuter = lmr.leftEyeCorner();
-	auto leftInner = lmr.innerLeftEyeCorner();
-	auto rightOuter = lmr.rightEyeCorner();
-	auto rightInner = lmr.innerRightEyeCorner();
-
-	circle(image, Point(leftOuter.first, leftOuter.second), 5, Scalar(200, 0, 0), 3);
-//	circle(image, Point(leftInner.first, leftInner.second), 5, Scalar(200, 0, 0), 3);
-//	circle(image, Point(rightOuter.first, rightOuter.second), 5, Scalar(200, 0, 0), 3);
-//	circle(image, Point(rightInner.first, rightInner.second), 5, Scalar(200, 0, 0), 3);
-
-	resize(image, image, Size(image.cols*0.6, image.rows*0.6));
-	imshow("Bla", image);
-	waitKey();
-}
-
 /* TODO
 	adaptive resize in image
 	nose, mouth, eye detectie constraints opleggen
@@ -101,11 +79,15 @@ void test(){
 */
 
 int main(int argc, char *argv[]) {
-//	test();
-//	YawTrainer yt = false;
-//	yt();
-	crossValidateYaw("positionsYaw"); // 199/244 met absolute error = 8.81148 (3 wrong directions)
-	crossValidateYaw("positionsYawOrig"); // 228/244 met absolute error = 2.2541 (2 wrong directions)
+	//	test();
+	//	test2();
+	//		YawTrainer yt = true;
+	//		yt();
+			crossValidateYaw("positionsYaw"); // 199/244 met absolute error = 8.81148 (3 wrong directions)
+	// 198/244 met absolute error = 9.4877 (5 wrong directions)
+//	crossValidateYaw("positionsYawOrig"); // 228/244 met absolute error = 2.2541 (2 wrong directions)
+	// 218/244 met absolute error : 7.54098 (12 wrong directions)
+//			crossValidateYaw("positionsYawBetter");
 
 	//	if(argc > 1){
 	//		param = QString(argv[1]).toDouble();
