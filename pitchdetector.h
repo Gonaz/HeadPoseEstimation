@@ -9,22 +9,17 @@
 
 class PitchDetector {
 public:
-	PitchDetector(bool train);
-	PitchDetector(QString retainDir);
+	PitchDetector(QString positionFile);
+	PitchDetector& retainDir(QString retainDir);
 	long operator()(QString filename, double fuziness=0.001);
 	static long pitch(QString filename);
 private:
+	QString positionFile;
 	QMap<QString, QPair<long, double> > positions;
 
-	cv::vector<double> detectFeatures(cv::Mat image);
-	cv::vector<double> readFeatures(QString filename);
-	double distanceMouthNose(cv::vector<double> features, cv::Mat image);
-	double distanceNoseEye(cv::vector<double> features, cv::Mat image);
-	QMap<QString, QPair<long, double> > calculateRelativePositions();
 	QVector<long> detectPitch(QString filename, double fuzziness);
-	void serialize(QMap<QString, QPair<long, double> > result);
 	QMap<QString, QPair<long, double> > deserialize();
-	double diffFromFile(QString filename);
+	double positionFromFile(QString filename);
 	bool containsTies(QVector<long> vec);
 };
 

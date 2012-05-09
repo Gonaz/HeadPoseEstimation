@@ -13,7 +13,7 @@
 
 using namespace cv;
 
-YawTrainer::YawTrainer(bool landmarks) : landmarks(landmarks) {
+YawTrainer::YawTrainer(bool landmarks)  {
 	using namespace std::placeholders;
 	if(landmarks){
 		positionFile = "positionsYawOrig";
@@ -60,7 +60,7 @@ QPair<long, long> YawTrainer::detectPositions(QString imagePath){
 		} else {
 			return qMakePair(long(0), value);
 		}
-//		return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), long(0));
+		//		return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), long(0));
 	} else {
 		if(eyes.at(0).x > eyes.at(1).x){
 			return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1)));

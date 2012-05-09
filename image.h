@@ -58,14 +58,6 @@ public:
 				}
 				if(eyes.size() > 1){
 					if (eyes.at(0).tl().x < eyes.at(1).br().x && eyes.at(0).br().x > eyes.at(1).tl().x && eyes.at(0).tl().y < eyes.at(1).br().y && eyes.at(0).br().y > eyes.at(1).tl().y){
-						std::cout << "Double" << std::endl;
-//						cv::Mat imageSmall;
-//						image.copyTo(imageSmall);
-//						cv::resize(imageSmall, imageSmall, cv::Size(imageSmall.cols*scale, imageSmall.rows*scale));
-//						cv::rectangle(imageSmall, eyes.at(0), cv::Scalar(0, 200, 0), 3);
-//						cv::rectangle(imageSmall, eyes.at(1), cv::Scalar(0, 0, 200), 3);
-//						cv::imshow("Double", imageSmall);
-//						cv::waitKey();
 						int area1 = eyes.at(0).area();
 						int area2 = eyes.at(1).area();
 						if(area1 > area2){
@@ -88,40 +80,58 @@ public:
 	}
 
 	static cv::vector<cv::Rect> detectMouth(cv::Mat image){
-		//TODO adaptive resize
-		double scale = 0.4;
-		double iScale = 1/scale;
-		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
-		cv::vector<cv::Rect> mouth = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml", 1);
+		cv::vector<cv::Rect> rectangles;
+		double scale = 1;
+		while(rectangles.size() == 0 && scale <= 1){
+			double iScale = 1/scale;
+			cv::Mat image2;
+			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
 
-		for(auto it=mouth.begin(); it != mouth.end(); ++it){
-			if((*it).tl().y < image.rows/2){
-				mouth.erase(it--);
+			QString file = "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
+			int amount = 1;
+
+			cv::CascadeClassifier cc(file.toStdString());
+			cc.detectMultiScale(image, rectangles);
+			int param = 5;
+			while(rectangles.size() > amount){
+				cc.detectMultiScale(image, rectangles, 1.1, param);
+				param += 5;
+
+				for(int i=0; i<rectangles.size(); ++i){
+					if((rectangles.at(i).br().y)/double(image2.rows)*100 < 50){
+						rectangles.erase(rectangles.begin()+i);
+						--i;
+					}
+				}
 			}
-		}
 
-		for(size_t i=0; i<mouth.size(); ++i){
-			cv::Rect r = mouth.at(i);
-			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
-			mouth.at(i) = newR;
+			for(size_t i=0; i<rectangles.size(); ++i){
+				cv::Rect r = rectangles.at(i);
+				cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
+				rectangles.at(i) = newR;
+			}
+			scale += 0.1;
 		}
-
-		return mouth;
+		return rectangles;
 	}
 
 	static cv::vector<cv::Rect> detectNose(cv::Mat image){
-		//TODO adaptive resize
+		cv::vector<cv::Rect> nose;
 		double scale = 0.4;
-		double iScale = 1/scale;
-		cv::resize(image, image, cv::Size(image.cols*scale, image.rows*scale));
-		cv::vector<cv::Rect> nose = detect(image, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_nose.xml", 1);
+		while(nose.size() == 0 && scale <= 1){
+			double iScale = 1/scale;
+			cv::Mat image2;
+			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
+			nose = detect(image2, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_nose.xml", 1);
 
-		for(size_t i=0; i<nose.size(); ++i){
-			cv::Rect r = nose.at(i);
-			cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
-			nose.at(i) = newR;
+			for(size_t i=0; i<nose.size(); ++i){
+				cv::Rect r = nose.at(i);
+				cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
+				nose.at(i) = newR;
+			}
+			scale += 0.1;
+			std::cout << "Rescale nose to " << scale << std::endl;
 		}
-
 		return nose;
 	}
 

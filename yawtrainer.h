@@ -9,7 +9,6 @@ public:
 	YawTrainer(bool landmarks);
 	void operator()();
 private:
-	bool landmarks;
 	QString positionFile;
 	std::function<QPair<long, long> (QString)> positions;
 

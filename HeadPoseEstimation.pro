@@ -15,14 +15,16 @@ SOURCES += main.cpp\
     yawdetector.cpp \
     pitchdetector.cpp \
     landmarkreader.cpp \
-    yawtrainer.cpp
+    yawtrainer.cpp \
+    pitchtrainer.cpp
 
 HEADERS  += \
     yawdetector.h \
     image.h \
     pitchdetector.h \
     landmarkreader.h \
-    yawtrainer.h
+    yawtrainer.h \
+    pitchtrainer.h
 
 FORMS    +=
 

@@ -12,117 +12,18 @@
 
 using namespace cv;
 
-PitchDetector::PitchDetector(bool train) {
-	if(train){
-		positions = calculateRelativePositions();
-		serialize(positions);
-	} else {
-		positions = deserialize();
-	}
+PitchDetector::PitchDetector(QString positionFile) : positionFile(positionFile){
+	positions = deserialize();
 }
 
-PitchDetector::PitchDetector(QString retainDir){
-	positions = deserialize();
+PitchDetector& PitchDetector::retainDir(QString retainDir){
 	auto keys = positions.keys();
 	for(int i=0; i<keys.count(); ++i){
 		if(keys.at(i).contains(retainDir)){
 			positions.remove(keys.at(i));
 		}
 	}
-}
-
-cv::vector<double> PitchDetector::readFeatures(QString filename){
-	filename.replace(".png", ".lm2");
-	LandMarkReader lmr = LandMarkReader(filename);
-	vector<double> features(10);
-
-	try{
-		features[0] = lmr.leftEyeCorner().first;
-		features[1] = lmr.leftEyeCorner().second;
-
-		features[2] = lmr.rightEyeCorner().first;
-		features[3] = lmr.rightEyeCorner().second;
-
-		features[4] = lmr.mouthLeftCorner().first;
-		features[5] = lmr.mouthLeftCorner().second;
-
-		features[6] = lmr.mouthRightCorner().first;
-		features[7] = lmr.mouthLeftCorner().second;
-
-		features[8] = lmr.nose().first;
-		features[9] = lmr.nose().second;
-	} catch(std::exception e) {
-//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
-	}
-
-	return features;
-}
-
-cv::vector<double> PitchDetector::detectFeatures(Mat image){
-	vector<Rect> eyes = Image::detectEyes(image);
-	vector<Rect> mouth = Image::detectMouth(image);
-	vector<Rect> nose = Image::detectNose(image);
-	vector<double> features(10);
-
-	try{
-		features[0] = Image::getLeftEye(eyes).x;
-		features[1] = Image::getLeftEye(eyes).y+Image::getLeftEye(eyes).size().height/2;
-
-		features[2] = Image::getRightEye(eyes).br().x;
-		features[3] = Image::getRightEye(eyes).y+Image::getRightEye(eyes).size().height/2;
-
-		features[4] = mouth.at(0).x;
-		features[5] = mouth.at(0).y+mouth.at(0).size().height/2;
-
-		features[6] = mouth.at(0).br().x;
-		features[7] = mouth.at(0).br().y-mouth.at(0).size().height/2;
-
-		features[8] = nose.at(0).x+nose.at(0).size().width/2;
-		features[9] = nose.at(0).y+nose.at(0).size().height/2;
-	} catch(std::exception e) {
-//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
-	}
-
-	return features;
-}
-
-double PitchDetector::distanceMouthNose(cv::vector<double> features, Mat image){
-	auto mouth = (features[5]+features[7])/2;
-	return abs(features[9]-mouth)/double(image.rows);
-}
-
-double PitchDetector::distanceNoseEye(cv::vector<double> features, Mat image){
-	auto eyes = (features[1]+features[3])/2;
-	return abs(features[9]-eyes)/double(image.rows);
-}
-
-QMap<QString, QPair<long, double> > PitchDetector::calculateRelativePositions(){
-	QMap<QString, QPair<long, double> > result;
-	QStringList subdirs = QDir("../HeadPoseEstimation/data/").entryList();
-	auto last = std::remove_if(subdirs.begin(), subdirs.end(), [](QString s){return !s.startsWith("bs");});
-
-for(auto elem=subdirs.begin(); elem != last; ++elem){
-	QDir imageDir("../HeadPoseEstimation/data/" + *(elem));
-	QStringList images = imageDir.entryList(QStringList("*.png"));
-	foreach(QString image, images){
-		QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
-		if(!image.contains("YR")){
-			Mat im = imread(imagePath.toStdString());
-			vector<double> features = readFeatures(imagePath);
-			//vector<double> features = detectFeatures(im);
-			long realPitch = PitchDetector::pitch(imagePath);
-
-//			double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
-			double div = distanceMouthNose(features, im)/distanceNoseEye(features, im);
-
-			std::cout << "Detect " << image.toStdString();
-			std::cout << "\t" << div << std::endl;
-			result[imagePath]= qMakePair(realPitch, div);
-		}
-	}
-}
-
-return result;
+	return *this;
 }
 
 bool PitchDetector::containsTies(QVector<long> vec){
@@ -137,7 +38,7 @@ bool PitchDetector::containsTies(QVector<long> vec){
 	return (vec.count(max) > 1) ? true : false;
 }
 
-double PitchDetector::diffFromFile(QString filename){
+double PitchDetector::positionFromFile(QString filename){
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
@@ -158,10 +59,7 @@ QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 		result[pair.first].push_back(pair.second);
 	}
 
-//	Mat im = imread(filename.toStdString());
-//	auto features = detectFeatures(im);
-//	double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
-	double diff = diffFromFile(filename);
+	double diff = positionFromFile(filename);
 
 	auto keys = result.keys();
 	QVector<long> support(keys.count(), 0);
@@ -201,13 +99,19 @@ long PitchDetector::operator()(QString filename, double fuzziness){
 		support = detectPitch(filename, fuzziness);
 	}
 
+	int maxSupport = 0;
+	int index = 0;
 	QVector<long> keys;
 	keys << -2 << -1 << 0 << 1 << 2;
 	for(int i=0; i<keys.count(); ++i){
-		std::cout << keys.at(i) << " -> " << support.at(i) << std::endl;
+		if(support.at(i) > maxSupport){
+			maxSupport = support.at(i);
+			index = i;
+		}
 	}
 
 	//TODO return the pitch
+	return keys.at(index);
 }
 
 long PitchDetector::pitch(QString filename){
@@ -229,26 +133,10 @@ long PitchDetector::pitch(QString filename){
 	return 0;
 }
 
-void PitchDetector::serialize(QMap<QString, QPair<long, double> > result){
-	QFile file("positionsPitchOrig");
-	if(file.open(QIODevice::WriteOnly)){
-		QTextStream stream(&file);
-
-		for(int i=0; i<positions.count(); ++i){
-			auto key = positions.keys().at(i);
-			auto value = positions.value(key);
-
-			stream << key << "\n" << value.first << "\n" << value.second << "\n";
-		}
-	}
-
-	file.close();
-}
-
 QMap<QString, QPair<long, double> > PitchDetector::deserialize(){
 	QMap<QString, QPair<long, double> > result;
 
-	QFile file("positionsPitchOrig");
+	QFile file(positionFile);
 	if(file.open(QIODevice::ReadOnly)){
 		QTextStream stream(&file);
 
