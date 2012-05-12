@@ -16,11 +16,11 @@ def processOutput():
 def update():
 	distance = end - start
 	p = int((i-start)/distance*100)
-	if p%10 == 0:
+	if p%2 == 0:
 		print(str(p)+"%","\tbest accuracy", best, "\tWith", bestVal)
 
 start = 1
-end = 200
+end = 1000
 for i in range(start, end):
 	val = i/1000
 	call = "./HeadPoseEstimation " + str(val) + "> outPitch"

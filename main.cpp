@@ -12,7 +12,7 @@
 #include <QTime>
 
 using namespace cv;
-double param = 0.14;
+double param = 0.014;
 
 void crossValidateYaw(QString positionsFile){
 	unsigned long correct = 0;
@@ -72,14 +72,14 @@ void crossValidatePitch(QString positionsFile){
 					++wrong;
 					++wrongDir;
 					error += abs(detectedPitch - realPitch);
+										std::cout << image.toStdString() << "\t" << realPitch << "\t" << detectedPitch << std::endl;
 				} else {
 					++correct;
 					++correctDir;
-//					std::cout << image.toStdString() << "\t" << realPitch << "\t" << detectedPitch << std::endl;
 				}
 			}
 		}
-//				std::cout << imageDir.toStdString() << " -> " << correctDir << "/" << (correctDir + wrongDir) << std::endl;
+						std::cout << imageDir.toStdString() << " -> " << correctDir << "/" << (correctDir + wrongDir) << std::endl;
 	}
 	std::cout << correct << "/" << (correct+wrong) << std::endl;
 	std::cout << "Average absolute error " << (error/double(correct+wrong)) << std::endl;
@@ -90,84 +90,105 @@ Point relative(Point original, Mat image){
 }
 
 void test2(){
-	QString filename = "../HeadPoseEstimation/data/bs002/bs002_PR_D_0.png";
-	Mat image = imread(filename.toStdString());
-	QString file = "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
-	int amount = 1;
+	QString base = "../HeadPoseEstimation/data";
+	QString extendedBase = base + "/" + "bs0";
+	for(unsigned long i=0; i<20; ++i){
+		QString imageDir = extendedBase + QString("%1").arg(i, 2, 10, QChar('0'));
+		QStringList images = QDir(imageDir).entryList(QStringList("*.png"));
+		foreach(QString image, images){
+			if(!image.contains("YR")){
+				QString filename = imageDir + "/" + image;
+				std::cout << filename.toStdString() << std::endl;
+				Mat image = imread(filename.toStdString());
+				vector<Rect> eyes = Image::detectEyes(image);
+				vector<Rect> nose = Image::detectNose(image);
+				vector<Rect> mouth = Image::detectMouth(image);
 
-	cv::vector<cv::Rect> rectangles;
-	cv::CascadeClassifier cc(file.toStdString());
-	cc.detectMultiScale(image, rectangles);
-	int param = 5;
-	while(rectangles.size() > amount){
-		cc.detectMultiScale(image, rectangles, 1.1, param);
-		param += 5;
+				std::cout << "Eyes " << eyes.size() << std::endl;
+				for(int i=0; i<eyes.size(); ++i){
+					rectangle(image, eyes.at(i), Scalar(200, 0, 0), 3);
+				}
 
-		std::cout << rectangles.size() << std::endl;
-		Mat image2;
-		image.copyTo(image2);
-		for(int i=0; i<rectangles.size(); ++i){
-			if((rectangles.at(i).br().y)/double(image.rows)*100 < 50){
-				rectangle(image2, rectangles.at(i), Scalar(0, 0, 200), 3);
-				rectangles.erase(rectangles.begin()+i);
-				--i;
+				std::cout << "Nose " << nose.size() << std::endl;
+				for(int i=0; i<nose.size(); ++i){
+					rectangle(image, nose.at(i), Scalar(0, 200, 0), 3);
+				}
+
+				std::cout << "Mouth " << mouth.size() << std::endl;
+				for(int i=0; i<mouth.size(); ++i){
+					rectangle(image, mouth.at(i), Scalar(0,0,200), 3);
+				}
+
+				resize(image, image, Size(image.cols*0.6, image.rows*0.6));
+				imshow("Image", image);
+				waitKey();
 			}
 		}
-
-
-		for(int i=0; i<rectangles.size(); ++i){
-			rectangle(image2, rectangles.at(i), Scalar(0, 200, 0), 3);
-		}
-		resize(image2, image2, Size(image.cols*0.6, image.rows*0.6));
-		imshow("Mouth", image2);
-		waitKey();
 	}
-	std::cout << "Finished" << std::endl;
+}
+
+double distanceMouthNose(cv::vector<double> features, Mat image){
+	auto mouth = (features[5]+features[7])/2;
+	return abs(features[9]-mouth)/double(image.rows);
+}
+
+double distanceNoseEye(cv::vector<double> features, Mat image){
+	auto eyes = (features[1]+features[3])/2;
+	return abs(features[9]-eyes)/double(image.rows);
 }
 
 void test(){
-	QString filename = "../HeadPoseEstimation/data/bs002/bs002_PR_D_0.png";
+	QString filename = "../HeadPoseEstimation/data/bs011/bs011_PR_D_0.png";
 	Mat image = imread(filename.toStdString());
 	vector<Rect> eyes = Image::detectEyes(image);
-	vector<Rect> mouth = Image::detectMouth(image);
-	std::cout << "Amount of mouths " << mouth.size() << std::endl;
-	std::cout << mouth.at(0).x << "|" << mouth.at(0).width << "|" << mouth.at(0).y << "|" << mouth.at(0).height << std::endl;
-	rectangle(image, mouth.at(0), Scalar(0, 200, 0), 3);
-	resize(image, image, Size(image.cols*0.6, image.rows*0.6));
-	imshow("mouth", image);
-	waitKey();
 	vector<Rect> nose = Image::detectNose(image);
-	vector<double> features(10);
+	vector<Rect> mouth = Image::detectMouth(image);
 
-	try{
-		features[0] = Image::getLeftEye(eyes).x;
-		features[1] = Image::getLeftEye(eyes).y+Image::getLeftEye(eyes).size().height/2;
-
-		std::cout << "Hoi" << std::endl;
-
-		features[2] = Image::getRightEye(eyes).br().x;
-		features[3] = Image::getRightEye(eyes).y+Image::getRightEye(eyes).size().height/2;
-
-		std::cout << "Hoi" << std::endl;
-
-		features[4] = mouth.at(0).x;
-		features[5] = mouth.at(0).y+mouth.at(0).size().height/2;
-
-		std::cout << "Hoi" << std::endl;
-
-		features[6] = mouth.at(0).br().x;
-		features[7] = mouth.at(0).br().y-mouth.at(0).size().height/2;
-
-		std::cout << "Hoi" << std::endl;
-
-		features[8] = nose.at(0).x+nose.at(0).size().width/2;
-		features[9] = nose.at(0).y+nose.at(0).size().height/2;
-	} catch(std::exception e) {
-		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
+	std::cout << "Eyes " << eyes.size() << std::endl;
+	for(int i=0; i<eyes.size(); ++i){
+		rectangle(image, eyes.at(i), Scalar(200, 0, 0), 3);
 	}
+
+	std::cout << "Nose " << nose.size() << std::endl;
+	for(int i=0; i<nose.size(); ++i){
+		rectangle(image, nose.at(i), Scalar(0, 200, 0), 3);
+	}
+
+	std::cout << "Mouth " << mouth.size() << std::endl;
+	for(int i=0; i<mouth.size(); ++i){
+		rectangle(image, mouth.at(i), Scalar(0,0,200), 3);
+	}
+
+//	PitchTrainer pt = false;
+//	vector<double> fts = pt.detectFeatures(filename);
+//	for(int i=0; i<fts.size(); i+=2){
+//		circle(image, Point(fts[i], fts[i+1]), 5, Scalar(0, 200, 200), 3);
+//	}
+
+	vector<double> features(10);
+	features[0] = Image::getLeftEye(eyes).x;
+	features[1] = Image::getLeftEye(eyes).y+Image::getLeftEye(eyes).height/2;
+
+	features[2] = Image::getRightEye(eyes).br().x;
+	features[3] = Image::getRightEye(eyes).y+Image::getRightEye(eyes).height/2;
+
+	features[4] = mouth.at(0).x;
+	features[5] = mouth.at(0).y+mouth.at(0).height/2;
+
+	features[6] = mouth.at(0).br().x;
+	features[7] = mouth.at(0).br().y-mouth.at(0).height/2;
+
+	features[8] = nose.at(0).x+nose.at(0).width/2;
+	features[9] = nose.at(0).y+nose.at(0).height/2;
+
+	std::cout << distanceMouthNose(features, image)/distanceNoseEye(features, image) << std::endl;
+
+	resize(image, image, Size(image.cols*0.6, image.rows*0.6));
+	imshow("Image", image);
+	waitKey();
 }
 
-/* TODO
+/* TODO:
 	adaptive resize in image
 	nose, mouth, eye detectie constraints opleggen
 	=> positie van features zou overal bekend moeten zijn
@@ -182,16 +203,16 @@ int main(int argc, char *argv[]) {
 	//	crossValidateYaw("positionsYawOrig");
 	//	crossValidateYaw("positionsYawBetter");
 
-//		PitchTrainer pt = false;
-//		pt();
+//			PitchTrainer pt = false;
+//			pt();
 
-//		crossValidatePitch("positionsPitch");
+			crossValidatePitch("positionsPitchNew");
 
-		if(argc > 1){
-			param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde voor diff, voor div 0.14
-		}
+//			if(argc > 1){
+//				param = QString(argv[1]).toDouble(); //0.0346 is een goed waarde voor diff, voor div 0.14, 0.041 voor divcal
+//			}
 
-		std::cout << param << std::endl;
-		crossValidatePitch("positionsPitchDivCal");
+//			std::cout << param << std::endl;
+//			crossValidatePitch("positionsPitchNew");
 	return 0;
 }

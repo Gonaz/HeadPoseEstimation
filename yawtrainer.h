@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QPair>
+#include <functional>
 
 class YawTrainer {
 public:

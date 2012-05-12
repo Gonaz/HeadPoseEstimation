@@ -30,7 +30,7 @@ void YawTrainer::operator ()(){
 }
 
 QMap<QString, QPair<long, long> > YawTrainer::calculateRelativePositions() {
-	//TODO this method can be made more general
+	//TODO: this method can be made more general
 	QMap<QString, QPair<long, long> > result;
 	QStringList subdirs = QDir("../HeadPoseEstimation/data/").entryList();
 	auto last = std::remove_if(subdirs.begin(), subdirs.end(), [](QString s){return !s.startsWith("bs");});
@@ -163,7 +163,7 @@ QPair<long, long> YawTrainer::detectBetterPositions(QString imagePath){
 	long rightOuterX = featureRightOuter.x;
 	long rightInnerX = featureRightInner.x;
 
-	long left = left = (leftOuterX + leftInnerX)/2/double(image.cols)*100;
+	long left = (leftOuterX + leftInnerX)/2/double(image.cols)*100;
 	long right = (rightOuterX + rightInnerX)/2/double(image.cols)*100;
 	if(left > right){
 		return qMakePair(left, right);
@@ -183,7 +183,7 @@ QPair<long, long> YawTrainer::readPositions(QString imagePath){
 	long rightInner = lmr.innerRightEyeCorner().first;
 
 #if logical
-	// TODO Dit zorg voor iets slechtere resultaten maar is logischer interpreteerbaar wanneer er maar 1 punt per oog beschikbaar is
+	// TODO: Dit zorg voor iets slechtere resultaten maar is logischer interpreteerbaar wanneer er maar 1 punt per oog beschikbaar is
 	long left = 0;
 	long right = 0;
 

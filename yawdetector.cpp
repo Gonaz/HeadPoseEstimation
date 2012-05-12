@@ -6,7 +6,7 @@
 #include <QTextStream>
 #include <algorithm>
 #include <random>
-#include <iostream> //TODO debug
+#include <iostream> //TODO: debug
 
 YawDetector::YawDetector(QString positionFile) : positionFile(positionFile){
 	positions = deserialize();
@@ -50,10 +50,10 @@ long YawDetector::operator()(QString image){
 			if(eyes1Size == 0){
 				score = 1;
 			} else if(eyes1Size == 1){
-				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){ //TODO eerste case zou niet mogen voorkomen
+				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){ //TODO: eerste case zou niet mogen voorkomen
 					score = (position1 - position2);
 				} else {
-					score = ONE_MILLION; //TODO dit kan ook enkel voorkomen wanneer volgorde belangrijk is
+					score = ONE_MILLION; //TODO: dit kan ook enkel voorkomen wanneer volgorde belangrijk is
 				}
 			} else {
 				score = (position1 - position2);
@@ -110,7 +110,7 @@ long YawDetector::getYawOfBest(QMultiMap<long, QString> scores, int number){
 
 int YawDetector::yaw(QString filename){
 	int rot;
-	filename = filename.split("/").last(); //TODO kan dit niet mooier met fileInfo?
+	filename = filename.split("/").last(); //TODO: kan dit niet mooier met fileInfo?
 	if(filename.contains("YR")){
 		int index = filename.lastIndexOf("YR")+3;
 		rot = filename.mid(index+1, 2).toInt();

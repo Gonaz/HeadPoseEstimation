@@ -16,7 +16,7 @@ PitchTrainer::PitchTrainer(bool landmarks) {
 		positionFile = "positionsPitchOrig";
 		features = std::bind(&PitchTrainer::readFeatures, this, _1);
 	} else {
-		positionFile = "positionsPitch";
+		positionFile = "positionsPitchNew";
 		features = std::bind(&PitchTrainer::detectFeatures, this, _1);
 	}
 }
@@ -47,7 +47,7 @@ vector<double> PitchTrainer::readFeatures(QString filename){
 		features[8] = lmr.nose().first;
 		features[9] = lmr.nose().second;
 	} catch(std::exception e) {
-//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
+		//		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg
 	}
 
 	return features;
@@ -61,7 +61,7 @@ vector<double> PitchTrainer::detectFeatures2(QString filename){
 	try{
 		features[0] = nose.at(0).y+nose.at(0).size().height/2;
 	} catch(std::exception e) {
-//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
+		//		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg
 	}
 
 	return features;
@@ -76,21 +76,21 @@ vector<double> PitchTrainer::detectFeatures(QString filename){
 
 	try{
 		features[0] = Image::getLeftEye(eyes).x;
-		features[1] = Image::getLeftEye(eyes).y+Image::getLeftEye(eyes).size().height/2;
+		features[1] = Image::getLeftEye(eyes).y+Image::getLeftEye(eyes).height/2;
 
 		features[2] = Image::getRightEye(eyes).br().x;
-		features[3] = Image::getRightEye(eyes).y+Image::getRightEye(eyes).size().height/2;
+		features[3] = Image::getRightEye(eyes).y+Image::getRightEye(eyes).height/2;
 
 		features[4] = mouth.at(0).x;
-		features[5] = mouth.at(0).y+mouth.at(0).size().height/2;
+		features[5] = mouth.at(0).y+mouth.at(0).height/2;
 
 		features[6] = mouth.at(0).br().x;
-		features[7] = mouth.at(0).br().y-mouth.at(0).size().height/2;
+		features[7] = mouth.at(0).br().y-mouth.at(0).height/2;
 
-		features[8] = nose.at(0).x+nose.at(0).size().width/2;
-		features[9] = nose.at(0).y+nose.at(0).size().height/2;
+		features[8] = nose.at(0).x+nose.at(0).width/2;
+		features[9] = nose.at(0).y+nose.at(0).height/2;
 	} catch(std::exception e) {
-//		std::cerr << "Error " << e.what() << std::endl; //TODO dit mag misschien weg
+		//		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg
 	}
 
 	return features;
@@ -122,7 +122,7 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 			long realPitch = PitchDetector::pitch(imagePath);
 
 			//double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
-			 double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
+			double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
 
 			std::cout << "Detect " << image.toStdString();
 			std::cout << "\t" << div << std::endl;

@@ -1,6 +1,6 @@
 from pprint import pprint
 
-f = open('positionsPitchDiv', 'rt')
+f = open('positionsPitchNew', 'rt')
 pitchDict = {'U':2, 'SU':1, 'SD':-1, 'D':2}
 counter = 0
 pitch = 0
@@ -14,13 +14,13 @@ def mean(_list):
 	return sum(_list)/len(_list)	
 
 def serialize():
-	g = open('positionsPitchDivCal', 'wt')
+	g = open('positionsPitchNewCal', 'wt')
 	for key in files:
 		g.write(key)
 		g.write(str(information[key][0]) + "\n")
 		g.write(str(information[key][1]) + "\n")
 	g.close()
-	
+	f
 def detectPitch(name):
 	if name.count('PR') > 0:
 		s = name.split('_')
