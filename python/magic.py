@@ -19,8 +19,8 @@ def update():
 	if p%2 == 0:
 		print(str(p)+"%","\tbest accuracy", best, "\tWith", bestVal)
 
-start = 1
-end = 1000
+start = 0
+end = 200
 for i in range(start, end):
 	val = i/1000
 	call = "./HeadPoseEstimation " + str(val) + "> outPitch"

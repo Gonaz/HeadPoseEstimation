@@ -121,8 +121,10 @@ for(auto elem=subdirs.begin(); elem != last; ++elem){
 			vector<double> fts = features(imagePath);
 			long realPitch = PitchDetector::pitch(imagePath);
 
-			//double diff = distanceMouthNose(features, im)-distanceNoseEye(features, im);
+//			double div = distanceMouthNose(fts, im)-distanceNoseEye(fts, im);
 			double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
+
+//			div = div/im.rows*2000;
 
 			std::cout << "Detect " << image.toStdString();
 			std::cout << "\t" << div << std::endl;

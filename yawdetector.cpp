@@ -34,7 +34,7 @@ size_t YawDetector::size(QPair<long, long> pair){
 
 long YawDetector::operator()(QString image){
 	auto pair1 = positionsFromFile(image);
-	long eyes1Size = size(pair1);
+	size_t eyes1Size = size(pair1);
 	long position1 = pair1.first + pair1.second;
 
 	QMultiMap<long, QString> scores;
@@ -137,4 +137,5 @@ QPair<long, long> YawDetector::positionsFromFile(QString filename){
 		}
 	}
 //	positionFile = temp;
+	return qMakePair(0l, 0l); //TODO: good style?
 }

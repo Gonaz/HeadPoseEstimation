@@ -1,9 +1,9 @@
 ../HeadPoseEstimation/data/bs000/bs000_N_N_0.png
 0
-1
+1.0627583019739884
 ../HeadPoseEstimation/data/bs000/bs000_N_N_1.png
 0
-1
+0.9372416980260118
 ../HeadPoseEstimation/data/bs000/bs000_PR_D_0.png
 -2
 0.5707948768733082
@@ -18,7 +18,7 @@
 1.9915032679738562
 ../HeadPoseEstimation/data/bs001/bs001_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs001/bs001_PR_D_0.png
 -2
 0.6303265764605255
@@ -33,7 +33,7 @@
 1.3303276069952699
 ../HeadPoseEstimation/data/bs002/bs002_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs002/bs002_PR_D_0.png
 -2
 0.4443464615384615
@@ -48,7 +48,7 @@
 1.0953846153846154
 ../HeadPoseEstimation/data/bs003/bs003_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs003/bs003_PR_D_0.png
 -2
 0.15582812042254737
@@ -63,7 +63,7 @@
 2.0978993261989696
 ../HeadPoseEstimation/data/bs004/bs004_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs004/bs004_PR_D_0.png
 -2
 0.20043153049482162
@@ -78,10 +78,10 @@
 3.143937309251013
 ../HeadPoseEstimation/data/bs005/bs005_N_N_0.png
 0
-1
+0.9758123013377097
 ../HeadPoseEstimation/data/bs005/bs005_N_N_1.png
 0
-1
+1.0241876986622904
 ../HeadPoseEstimation/data/bs005/bs005_PR_D_0.png
 -2
 0.33466598226829863
@@ -96,7 +96,7 @@
 1.99360424905353
 ../HeadPoseEstimation/data/bs006/bs006_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs006/bs006_PR_D_0.png
 -2
 0.4726766533750045
@@ -111,7 +111,7 @@
 2.476146854905342
 ../HeadPoseEstimation/data/bs007/bs007_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs007/bs007_PR_D_0.png
 -2
 0.7926274626274626
@@ -126,7 +126,7 @@
 2.3376794376794376
 ../HeadPoseEstimation/data/bs008/bs008_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs008/bs008_PR_D_0.png
 -2
 0.3273076893315071
@@ -141,7 +141,7 @@
 1.9321138117015266
 ../HeadPoseEstimation/data/bs009/bs009_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs009/bs009_PR_D_0.png
 -2
 0.24784752839943378
@@ -156,10 +156,10 @@
 3.690746782073983
 ../HeadPoseEstimation/data/bs010/bs010_N_N_0.png
 0
-1
+1.1816503716857878
 ../HeadPoseEstimation/data/bs010/bs010_N_N_1.png
 0
-1
+0.8183496283142122
 ../HeadPoseEstimation/data/bs010/bs010_PR_D_0.png
 -2
 0.54242425253938
@@ -174,7 +174,7 @@
 2.0938310507008118
 ../HeadPoseEstimation/data/bs011/bs011_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs011/bs011_PR_D_0.png
 -2
 0.30647791701932087
@@ -189,10 +189,10 @@
 3.124006880170366
 ../HeadPoseEstimation/data/bs012/bs012_N_N_0.png
 0
-1
+1.0164200761227304
 ../HeadPoseEstimation/data/bs012/bs012_N_N_1.png
 0
-1
+0.9835799238772694
 ../HeadPoseEstimation/data/bs012/bs012_PR_D_0.png
 -2
 0.49486760353110465
@@ -207,7 +207,7 @@
 2.0749830849465005
 ../HeadPoseEstimation/data/bs013/bs013_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs013/bs013_PR_D_0.png
 -2
 0.42571051271746
@@ -222,7 +222,7 @@
 2.3677082735258654
 ../HeadPoseEstimation/data/bs014/bs014_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs014/bs014_PR_D_0.png
 -2
 0.6464648888888889
@@ -237,7 +237,7 @@
 2.1748177777777777
 ../HeadPoseEstimation/data/bs015/bs015_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs015/bs015_PR_D_0.png
 -2
 0.6383414135255534
@@ -252,7 +252,7 @@
 3.1325708778727295
 ../HeadPoseEstimation/data/bs016/bs016_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs016/bs016_PR_D_0.png
 -2
 0.33918018979167835
@@ -267,7 +267,7 @@
 1.5749789432309507
 ../HeadPoseEstimation/data/bs017/bs017_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs017/bs017_PR_D_0.png
 -2
 0.8888776858303221
@@ -282,7 +282,7 @@
 3.6378275226528314
 ../HeadPoseEstimation/data/bs018/bs018_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs018/bs018_PR_D_0.png
 -2
 0.4899708969344206
@@ -297,7 +297,7 @@
 2.3612937712651774
 ../HeadPoseEstimation/data/bs019/bs019_N_N_0.png
 0
-1
+1.0
 ../HeadPoseEstimation/data/bs019/bs019_PR_D_0.png
 -2
 0.8111981290414231

@@ -203,7 +203,7 @@ QPair<long, long> YawTrainer::readPositions(QString imagePath){
 		right = (rightOuter + rightInner)/2/double(image.cols)*100;
 	}
 #else //logical
-	long left = left = (leftOuter + leftInner)/2/double(image.cols)*100;
+	long left = (leftOuter + leftInner)/2/double(image.cols)*100;
 	long right = (rightOuter + rightInner)/2/double(image.cols)*100;
 #endif //logical
 

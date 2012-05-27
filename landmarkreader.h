@@ -13,10 +13,12 @@ public:
 	QPair<long, long> mouthRightCorner();
 	QPair<long, long> innerLeftEyeCorner();
 	QPair<long, long> innerRightEyeCorner();
+
+	QPair<long, long> fetchValue(QString name); //TODO: dit terug private plaatsen
 private:
 	QString filename;
 
-	QPair<long, long> fetchValue(QString name);
+
 };
 
 #endif // LANDMARKREADER_H

@@ -48,6 +48,7 @@ double PitchDetector::positionFromFile(QString filename){
 			return allPositions[keys.at(i)].second;
 		}
 	}
+	//TODO: moet dit een error smijten
 }
 
 QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
@@ -89,7 +90,7 @@ long PitchDetector::operator()(QString filename, double fuzziness){
 	while(containsTies(support) && fuzziness > 0){
 //		std::cout << "Tie" << std::endl; //TODO: dit mag later weg
 		++counter;
-		fuzziness -= 0.0002;
+		fuzziness -= 0.0002; //0.0002
 		support = detectPitch(filename, fuzziness);
 	}
 	while(containsTies(support)){

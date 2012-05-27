@@ -88,7 +88,7 @@ public:
 			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
 
 			QString file = "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
-			int amount = 1;
+			size_t amount = 1;
 
 			cv::CascadeClassifier cc(file.toStdString());
 			cc.detectMultiScale(image2, rectangles);
@@ -100,11 +100,11 @@ public:
 
 				cv::Mat image3;
 				image2.copyTo(image3);
-				for(int i=0; i<rectangles.size(); ++i){
+				for(size_t i=0; i<rectangles.size(); ++i){
 					cv::rectangle(image3, rectangles.at(i), cv::Scalar(0,200,0), 3);
 				}
 
-				for(int i=0; i<rectangles.size(); ++i){
+				for(size_t i=0; i<rectangles.size(); ++i){
 					if((rectangles.at(i).br().y)/double(image2.rows)*100 < 75){
 						cv::circle(image3, cv::Point(rectangles.at(i).br().x, rectangles.at(i).br().y), 5, cv::Scalar(0, 200, 200), 3);
 						cv::rectangle(image3, rectangles.at(i), cv::Scalar(0,0,200), 3);
@@ -114,8 +114,8 @@ public:
 				}
 
 				if(rectangles.size() > 1){
-					for(int i=0; i<rectangles.size(); ++i){
-						for(int j=0; j<rectangles.size(); ++j){
+					for(size_t i=0; i<rectangles.size(); ++i){
+						for(size_t j=0; j<rectangles.size(); ++j){
 							if(i != j){
 								if (rectangles.at(i).tl().x < rectangles.at(j).br().x && rectangles.at(i).br().x > rectangles.at(j).tl().x && rectangles.at(i).tl().y < rectangles.at(j).br().y && rectangles.at(i).br().y > rectangles.at(j).tl().y){
 									int area1 = rectangles.at(i).area();
