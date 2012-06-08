@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <iostream> //TODO: debug
 
 using namespace cv;
 
@@ -31,38 +32,20 @@ vector<double> PitchTrainer::readFeatures(QString filename){
 	LandMarkReader lmr = LandMarkReader(filename);
 	vector<double> features(10);
 
-	try{
-		features[0] = lmr.leftEyeCorner().first;
-		features[1] = lmr.leftEyeCorner().second;
+	features[0] = lmr.leftEyeCorner().first;
+	features[1] = lmr.leftEyeCorner().second;
 
-		features[2] = lmr.rightEyeCorner().first;
-		features[3] = lmr.rightEyeCorner().second;
+	features[2] = lmr.rightEyeCorner().first;
+	features[3] = lmr.rightEyeCorner().second;
 
-		features[4] = lmr.mouthLeftCorner().first;
-		features[5] = lmr.mouthLeftCorner().second;
+	features[4] = lmr.mouthLeftCorner().first;
+	features[5] = lmr.mouthLeftCorner().second;
 
-		features[6] = lmr.mouthRightCorner().first;
-		features[7] = lmr.mouthLeftCorner().second;
+	features[6] = lmr.mouthRightCorner().first;
+	features[7] = lmr.mouthLeftCorner().second;
 
-		features[8] = lmr.nose().first;
-		features[9] = lmr.nose().second;
-	} catch(std::exception e) {
-		//		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg
-	}
-
-	return features;
-}
-
-vector<double> PitchTrainer::detectFeatures2(QString filename){
-	Mat image = imread(filename.toStdString());
-	vector<Rect> nose = Image::detectNose(image);
-	vector<double> features(1);
-
-	try{
-		features[0] = nose.at(0).y+nose.at(0).size().height/2;
-	} catch(std::exception e) {
-		//		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg
-	}
+	features[8] = lmr.nose().first;
+	features[9] = lmr.nose().second;
 
 	return features;
 }
@@ -89,8 +72,8 @@ vector<double> PitchTrainer::detectFeatures(QString filename){
 
 		features[8] = nose.at(0).x+nose.at(0).width/2;
 		features[9] = nose.at(0).y+nose.at(0).height/2;
-	} catch(std::exception e) {
-		//		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg
+	} catch(std::exception const& e) {
+				std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg (dig gebeurd effectief)
 	}
 
 	return features;
@@ -111,29 +94,26 @@ QMap<QString, QPair<long, double> > PitchTrainer::calculateRelativePositions(){
 	QStringList subdirs = QDir("../HeadPoseEstimation/data/").entryList();
 	auto last = std::remove_if(subdirs.begin(), subdirs.end(), [](QString s){return !s.startsWith("bs");});
 
-for(auto elem=subdirs.begin(); elem != last; ++elem){
-	QDir imageDir("../HeadPoseEstimation/data/" + *(elem));
-	QStringList images = imageDir.entryList(QStringList("*.png"));
-	foreach(QString image, images){
-		QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
-		if(!image.contains("YR")){
-			Mat im = imread(imagePath.toStdString());
-			vector<double> fts = features(imagePath);
-			long realPitch = PitchDetector::pitch(imagePath);
+	for(auto elem=subdirs.begin(); elem != last; ++elem){
+		QDir imageDir("../HeadPoseEstimation/data/" + *(elem));
+		QStringList images = imageDir.entryList(QStringList("*.png"));
+		foreach(QString image, images){
+			QString imagePath = "../HeadPoseEstimation/data/" + *(elem) + "/" + image;
+			if(!image.contains("YR")){
+				Mat im = imread(imagePath.toStdString());
+				vector<double> fts = features(imagePath);
+				long realPitch = PitchDetector::pitch(imagePath);
 
-//			double div = distanceMouthNose(fts, im)-distanceNoseEye(fts, im);
-			double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
+				double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
 
-//			div = div/im.rows*2000;
-
-			std::cout << "Detect " << image.toStdString();
-			std::cout << "\t" << div << std::endl;
-			result[imagePath]= qMakePair(realPitch, div);
+				std::cout << "Detect " << image.toStdString();
+				std::cout << "\t" << div << std::endl;
+				result[imagePath]= qMakePair(realPitch, div);
+			}
 		}
 	}
-}
 
-return result;
+	return result;
 }
 
 void PitchTrainer::serialize(QMap<QString, QPair<long, double> > positions){

@@ -15,7 +15,6 @@ private:
 
 	cv::vector<double> readFeatures(QString filename);
 	cv::vector<double> detectFeatures(QString filename);
-	cv::vector<double> detectFeatures2(QString filename);
 	QMap<QString, QPair<long, double> > calculateRelativePositions();
 	void serialize(QMap<QString, QPair<long, double> > positions);
 	double distanceMouthNose(cv::vector<double> features, cv::Mat image);

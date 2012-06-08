@@ -48,7 +48,7 @@ long YawDetector::operator()(QString image){
 		} else {
 			long position2 = pair2.first + pair2.second;
 			if(eyes1Size == 0){
-				score = 1;
+				score = 0;
 			} else if(eyes1Size == 1){
 				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){ //TODO: eerste case zou niet mogen voorkomen
 					score = (position1 - position2);
@@ -110,7 +110,8 @@ long YawDetector::getYawOfBest(QMultiMap<long, QString> scores, int number){
 
 int YawDetector::yaw(QString filename){
 	int rot;
-	filename = filename.split("/").last(); //TODO: kan dit niet mooier met fileInfo?
+	QFileInfo info(filename);
+	filename = info.fileName();
 	if(filename.contains("YR")){
 		int index = filename.lastIndexOf("YR")+3;
 		rot = filename.mid(index+1, 2).toInt();
@@ -133,9 +134,10 @@ QPair<long, long> YawDetector::positionsFromFile(QString filename){
 	for(int i=0; i<keys.count(); ++i){
 		QFileInfo info2(keys.at(i));
 		if(info1.fileName() == info2.fileName()){
+//			positionFile = temp;
 			return allPositions[keys.at(i)];
 		}
 	}
 //	positionFile = temp;
-	return qMakePair(0l, 0l); //TODO: good style?
+	return qMakePair(0l, 0l); //TODO: good style? (Hoe vaak komt dit voor)
 }

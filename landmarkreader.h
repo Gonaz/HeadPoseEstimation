@@ -14,11 +14,9 @@ public:
 	QPair<long, long> innerLeftEyeCorner();
 	QPair<long, long> innerRightEyeCorner();
 
-	QPair<long, long> fetchValue(QString name); //TODO: dit terug private plaatsen
+	QPair<long, long> fetchValue(QString name); //TODO: dit staat tijdelijk public
 private:
 	QString filename;
-
-
 };
 
 #endif // LANDMARKREADER_H

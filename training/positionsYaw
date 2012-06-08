@@ -47,11 +47,11 @@
 67
 24
 ../HeadPoseEstimation/data/bs001/bs001_PR_SU_0.png
-70
-22
-../HeadPoseEstimation/data/bs001/bs001_PR_U_0.png
 72
 26
+../HeadPoseEstimation/data/bs001/bs001_PR_U_0.png
+70
+22
 ../HeadPoseEstimation/data/bs001/bs001_YR_L45_0.png
 90
 67
@@ -568,9 +568,6 @@
 ../HeadPoseEstimation/data/bs015/bs015_YR_L45_0.png
 91
 61
-../HeadPoseEstimation/data/bs015/bs015_YR_L90_0.png
-24
-0
 ../HeadPoseEstimation/data/bs015/bs015_YR_R10_0.png
 56
 14

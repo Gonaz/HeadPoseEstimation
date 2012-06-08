@@ -39,12 +39,16 @@ bool PitchDetector::containsTies(QVector<long> vec){
 }
 
 double PitchDetector::positionFromFile(QString filename){
+//	QString temp = positionFile;
+//	positionFile = "posistionsPitchNew";
+
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
 	for(int i=0; i<keys.count(); ++i){
 		QFileInfo info2(keys.at(i));
 		if(info1.fileName() == info2.fileName()){
+
 			return allPositions[keys.at(i)].second;
 		}
 	}
@@ -61,6 +65,9 @@ QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 	}
 
 	double diff = positionFromFile(filename);
+	if(isnan(diff)){
+		diff = 0;
+	}
 
 	auto keys = result.keys();
 	QVector<long> support(keys.count(), 0);
@@ -68,10 +75,7 @@ QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 		auto values = result.value(keys.at(i));
 		for(int j=0; j<values.count(); ++j){
 			if(isnan(values.at(j))){
-				values.replace(j, 0); //TODO: temporary workaround
-			}
-			if(isnan(diff)){
-				diff = 0; //TODO: temporary workaround
+				values.replace(j, 0);
 			}
 
 			double a = std::abs(values.at(j) - diff);
@@ -88,13 +92,11 @@ long PitchDetector::operator()(QString filename, double fuzziness){
 	auto support = detectPitch(filename, fuzziness);
 	int counter = 0;
 	while(containsTies(support) && fuzziness > 0){
-//		std::cout << "Tie" << std::endl; //TODO: dit mag later weg
 		++counter;
 		fuzziness -= 0.0002; //0.0002
 		support = detectPitch(filename, fuzziness);
 	}
 	while(containsTies(support)){
-//		std::cout << "Tie" << std::endl; //TODO: dit mag later weg
 		++counter;
 		fuzziness += 0.002;
 		support = detectPitch(filename, fuzziness);
@@ -111,12 +113,12 @@ long PitchDetector::operator()(QString filename, double fuzziness){
 		}
 	}
 
-	//TODO: return the pitch
 	return keys.at(index);
 }
 
 long PitchDetector::pitch(QString filename){
-	filename = filename.split("/").last(); //TODO: kan dit niet mooier met fileInfo?
+	QFileInfo info(filename);
+	filename = info.fileName();
 	if(filename.contains("PR")){
 		int index = filename.lastIndexOf("PR")+3;
 		filename = filename.mid(index, filename.length()-index-6);

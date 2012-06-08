@@ -3,46 +3,55 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
-#include <opencv2/highgui/highgui.hpp> //TODO: debug
-#include <iostream> //TODO: debug
 #include <QString>
+#include <functional>
 
-class Image{
-public:
+namespace Image{
 
-	static long getRelativePositionEye(cv::Mat image, cv::Rect eye){
+	inline
+	long getRelativePositionEye(cv::Mat image, cv::Rect eye){
 		long center = eye.x + (eye.width/2);
 		return center/double(image.cols)*100;
 	}
 
-	static cv::Rect getLeftEye(cv::vector<cv::Rect> v){ //TODO: duplicate code with getRightEye
+	inline
+	cv::Rect getEye(cv::vector<cv::Rect> v, std::function<bool (int, int)> f){
 		if(v.size() == 0){
 			throw std::exception();
-			return cv::Rect(-1, -1, -1, -1);
 		} else if(v.size() == 1){
 			throw std::exception();
-			return v.at(0);
 		} else {
-			assert(v.size() == 2); //TODO: debug
-			return (v.at(0).x < v.at(1).x) ? v.at(0) : v.at(1);
+			auto g = std::bind(f, v.at(0).x, v.at(1).x);
+			return g() ? v.at(0) : v.at(1);
 		}
 	}
 
-	static cv::Rect getRightEye(cv::vector<cv::Rect> v){ //TODO: duplicate code with getLeftEye
-		if(v.size() == 0){
-			throw std::exception();
-			return cv::Rect(-1, -1, -1, -1);
-		} else if(v.size() == 1){
-			throw std::exception();
-			return v.at(0);
-		} else {
-			assert(v.size() == 2); //TODO: debug
-			return (v.at(0).x > v.at(1).x) ? v.at(0) : v.at(1);
-		}
+	inline
+	cv::Rect getLeftEye(cv::vector<cv::Rect> v){
+		return getEye(v, std::less<int>());
 	}
 
+	inline
+	cv::Rect getRightEye(cv::vector<cv::Rect> v){
+		return getEye(v, std::greater<int>());
+	}
 
-	static cv::vector<cv::Rect> detectEyes(cv::Mat image){
+	inline
+	cv::vector<cv::Rect> detect(cv::Mat image, QString file, size_t amount){
+		cv::vector<cv::Rect> rectangles;
+		cv::CascadeClassifier cc(file.toStdString());
+		cc.detectMultiScale(image, rectangles);
+		int param = 5;
+		while(rectangles.size() > amount){
+			cc.detectMultiScale(image, rectangles, 1.1, param);
+			param += 5;
+		}
+
+		return rectangles;
+	}
+
+	inline
+	cv::vector<cv::Rect> detectEyes(cv::Mat image){
 		cv::vector<cv::Rect> eyes;
 		double scale = 0.2;
 		while(eyes.size() == 0 && scale <= 1){
@@ -79,7 +88,8 @@ public:
 		return eyes;
 	}
 
-	static cv::vector<cv::Rect> detectMouth(cv::Mat image){
+	inline
+	cv::vector<cv::Rect> detectMouth(cv::Mat image){
 		cv::vector<cv::Rect> rectangles;
 		double scale = 0.4;
 		while(rectangles.size() == 0 && scale <= 1){
@@ -132,9 +142,6 @@ public:
 						}
 					}
 				}
-
-//				cv::imshow("TMP", image3);
-//				cv::waitKey();
 			}
 
 			for(size_t i=0; i<rectangles.size(); ++i){
@@ -143,12 +150,12 @@ public:
 				rectangles.at(i) = newR;
 			}
 			scale += 0.1;
-			std::cout << "Rescale mouth to " << scale << std::endl;
 		}
 		return rectangles;
 	}
 
-	static cv::vector<cv::Rect> detectNose(cv::Mat image){
+	inline
+	cv::vector<cv::Rect> detectNose(cv::Mat image){
 		cv::vector<cv::Rect> nose;
 		double scale = 0.4;
 		while(nose.size() == 0 && scale <= 1){
@@ -163,24 +170,9 @@ public:
 				nose.at(i) = newR;
 			}
 			scale += 0.1;
-			std::cout << "Rescale nose to " << scale << std::endl;
 		}
 		return nose;
 	}
-
-	static cv::vector<cv::Rect> detect(cv::Mat image, QString file, size_t amount){
-		cv::vector<cv::Rect> rectangles;
-		cv::CascadeClassifier cc(file.toStdString());
-		cc.detectMultiScale(image, rectangles);
-		int param = 5;
-		while(rectangles.size() > amount){
-			cc.detectMultiScale(image, rectangles, 1.1, param);
-			param += 5;
-		}
-
-		return rectangles;
-	}
-
-};
+}
 
 #endif // IMAGE_H
