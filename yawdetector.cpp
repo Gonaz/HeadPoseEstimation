@@ -50,10 +50,10 @@ long YawDetector::operator()(QString image){
 			if(eyes1Size == 0){
 				score = 0;
 			} else if(eyes1Size == 1){
-				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){ //TODO: eerste case zou niet mogen voorkomen
+				if((pair1.first == 0 && pair2.first == 0) || (pair1.second == 0 && pair2.second == 0)){
 					score = (position1 - position2);
 				} else {
-					score = ONE_MILLION; //TODO: dit kan ook enkel voorkomen wanneer volgorde belangrijk is
+					score = ONE_MILLION;
 				}
 			} else {
 				score = (position1 - position2);
@@ -126,18 +126,14 @@ int YawDetector::yaw(QString filename){
 }
 
 QPair<long, long> YawDetector::positionsFromFile(QString filename){
-//	QString temp = positionFile;
-//	positionFile = "positionsYaw";
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
 	for(int i=0; i<keys.count(); ++i){
 		QFileInfo info2(keys.at(i));
 		if(info1.fileName() == info2.fileName()){
-//			positionFile = temp;
 			return allPositions[keys.at(i)];
 		}
 	}
-//	positionFile = temp;
-	return qMakePair(0l, 0l); //TODO: good style? (Hoe vaak komt dit voor)
+	return qMakePair(0l, 0l);
 }

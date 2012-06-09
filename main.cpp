@@ -11,9 +11,9 @@
 #include <QTime>
 
 using namespace cv;
-//double param = 0.15; //own
+double param = 0.15; //own
 //double param = 0.41; //landmarks
-double param = 6.5; //euler (3.9)
+//double param = 6.5; //euler (3.9)
 
 void crossValidateYaw(QString positionsFile){
 	unsigned long correct = 0;
@@ -83,21 +83,21 @@ void crossValidatePitch(QString positionsFile){
 }
 
 int main(int argc, char **argv) {
-//		YawTrainer yt = true;
+//		YawTrainer yt = false;
 //		yt();
 //		crossValidateYaw("positionsYaw");
 //		crossValidateYaw("positionsYawOrig");
 
-//		PitchTrainer pt = false;
-//		pt();
+		PitchTrainer pt = false;
+		pt();
 
-//		crossValidatePitch("positionsPitchNew");
+		crossValidatePitch("positionsPitchNew");
 
-	if(argc > 1){
-		param = QString(argv[1]).toDouble();
-	}
+//	if(argc > 1){
+//		param = QString(argv[1]).toDouble();
+//	}
 
-	std::cout << param << std::endl;
-	crossValidatePitch("output1");
+//	std::cout << param << std::endl;
+//	crossValidatePitch("output1");
 	return 0;
 }

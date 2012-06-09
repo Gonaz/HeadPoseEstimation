@@ -73,7 +73,8 @@ vector<double> PitchTrainer::detectFeatures(QString filename){
 		features[8] = nose.at(0).x+nose.at(0).width/2;
 		features[9] = nose.at(0).y+nose.at(0).height/2;
 	} catch(std::exception const& e) {
-				std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg (dig gebeurd effectief)
+		return features;
+		std::cerr << "Error " << e.what() << std::endl; //TODO: dit mag misschien weg (dig gebeurd effectief)
 	}
 
 	return features;

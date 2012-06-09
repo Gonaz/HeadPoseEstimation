@@ -65,7 +65,7 @@ namespace Image{
 				} else if(eyes.at(1).tl().y > eyes.at(0).br().y ){
 					eyes.erase(eyes.end());
 				}
-				if(eyes.size() > 1){ //TODO: dit zou moeten werken met meer dan twee elementen in de eyes lijst
+				if(eyes.size() > 1){
 					if (eyes.at(0).tl().x < eyes.at(1).br().x && eyes.at(0).br().x > eyes.at(1).tl().x && eyes.at(0).tl().y < eyes.at(1).br().y && eyes.at(0).br().y > eyes.at(1).tl().y){
 						int area1 = eyes.at(0).area();
 						int area2 = eyes.at(1).area();
@@ -108,16 +108,8 @@ namespace Image{
 				cc.detectMultiScale(image2, rectangles, 1.1, param);
 				param += 5;
 
-				cv::Mat image3;
-				image2.copyTo(image3);
-				for(size_t i=0; i<rectangles.size(); ++i){
-					cv::rectangle(image3, rectangles.at(i), cv::Scalar(0,200,0), 3);
-				}
-
 				for(size_t i=0; i<rectangles.size(); ++i){
 					if((rectangles.at(i).br().y)/double(image2.rows)*100 < 75){
-						cv::circle(image3, cv::Point(rectangles.at(i).br().x, rectangles.at(i).br().y), 5, cv::Scalar(0, 200, 200), 3);
-						cv::rectangle(image3, rectangles.at(i), cv::Scalar(0,0,200), 3);
 						rectangles.erase(rectangles.begin()+i);
 						--i;
 					}
@@ -131,11 +123,9 @@ namespace Image{
 									int area1 = rectangles.at(i).area();
 									int area2 = rectangles.at(j).area();
 									if(area1 > area2){
-										cv::rectangle(image3, rectangles.at(j), cv::Scalar(200,0, 0), 3);
-										rectangles.erase(rectangles.begin()+j);
+										rectangles.erase(rectangles.begin()+j); //TODO: kan dit geen out of bounds geven
 									} else {
-										cv::rectangle(image3, rectangles.at(i), cv::Scalar(200,0,0), 3);
-										rectangles.erase(rectangles.begin()+i);
+										rectangles.erase(rectangles.begin()+i); //TODO: kan dit geen out of bounds geven
 									}
 								}
 							}
@@ -143,6 +133,8 @@ namespace Image{
 					}
 				}
 			}
+
+			//TODO: we laten param en scale tegelijk stijgen :s
 
 			for(size_t i=0; i<rectangles.size(); ++i){
 				cv::Rect r = rectangles.at(i);

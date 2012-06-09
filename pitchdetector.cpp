@@ -39,20 +39,16 @@ bool PitchDetector::containsTies(QVector<long> vec){
 }
 
 double PitchDetector::positionFromFile(QString filename){
-//	QString temp = positionFile;
-//	positionFile = "posistionsPitchNew";
-
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
 	for(int i=0; i<keys.count(); ++i){
 		QFileInfo info2(keys.at(i));
 		if(info1.fileName() == info2.fileName()){
-
 			return allPositions[keys.at(i)].second;
 		}
 	}
-	//TODO: moet dit een error smijten
+	return 0;
 }
 
 QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
@@ -93,7 +89,7 @@ long PitchDetector::operator()(QString filename, double fuzziness){
 	int counter = 0;
 	while(containsTies(support) && fuzziness > 0){
 		++counter;
-		fuzziness -= 0.0002; //0.0002
+		fuzziness -= 0.0002;
 		support = detectPitch(filename, fuzziness);
 	}
 	while(containsTies(support)){
