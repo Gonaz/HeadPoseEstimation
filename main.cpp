@@ -83,21 +83,23 @@ void crossValidatePitch(QString positionsFile){
 }
 
 int main(int argc, char **argv) {
+//	PitchTrainer pt = false;
+//	pt.test();
 //		YawTrainer yt = false;
 //		yt();
 //		crossValidateYaw("positionsYaw");
 //		crossValidateYaw("positionsYawOrig");
 
-		PitchTrainer pt = false;
-		pt();
+//		PitchTrainer pt = false;
+//		pt();
 
-		crossValidatePitch("positionsPitchNew");
+//		crossValidatePitch("positionsPitch");
 
-//	if(argc > 1){
-//		param = QString(argv[1]).toDouble();
-//	}
+	if(argc > 1){
+		param = QString(argv[1]).toDouble();
+	}
 
-//	std::cout << param << std::endl;
-//	crossValidatePitch("output1");
+	std::cout << param << std::endl;
+	crossValidatePitch("positionsPitch");
 	return 0;
 }

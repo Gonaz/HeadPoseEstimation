@@ -8,7 +8,14 @@
 #include <iostream>
 #include <functional>
 
+//Logical means that the results are logical interpretable. But the accuracy is a bit worse.
+//When logical is set, the average position of one eye is the position of that eye.
+//When logical is unset, the average position of one eye is half that position of that eye.
 #define logical 0
+
+//Sorted means that the position of the eyes will be sorted.
+//When sorted is set, first the biggest position is serialized and then the smallest position.
+//When sorted is unset, first the position of the right eye is serialized and then the position of the left eye.
 #define sorted 0
 
 using namespace cv;
@@ -78,7 +85,6 @@ QPair<long, long> YawTrainer::readPositions(QString imagePath){
 	long rightOuter = lmr.rightEyeCorner().first;
 	long rightInner = lmr.innerRightEyeCorner().first;
 
-// TODO: Dit zorg voor iets slechtere resultaten maar is logischer interpreteerbaar wanneer er maar 1 punt per oog beschikbaar is
 #if logical
 	long left = 0;
 	long right = 0;

@@ -13,8 +13,7 @@ public:
 	QPair<long, long> mouthRightCorner();
 	QPair<long, long> innerLeftEyeCorner();
 	QPair<long, long> innerRightEyeCorner();
-
-	QPair<long, long> fetchValue(QString name); //TODO: dit staat tijdelijk public
+	QPair<long, long> fetchValue(QString name);
 private:
 	QString filename;
 };

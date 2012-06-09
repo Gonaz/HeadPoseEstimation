@@ -123,9 +123,11 @@ namespace Image{
 									int area1 = rectangles.at(i).area();
 									int area2 = rectangles.at(j).area();
 									if(area1 > area2){
-										rectangles.erase(rectangles.begin()+j); //TODO: kan dit geen out of bounds geven
+										rectangles.erase(rectangles.begin()+j);
+										i = 0; j = 0;
 									} else {
-										rectangles.erase(rectangles.begin()+i); //TODO: kan dit geen out of bounds geven
+										rectangles.erase(rectangles.begin()+i);
+										i = 0; j = 0;
 									}
 								}
 							}
