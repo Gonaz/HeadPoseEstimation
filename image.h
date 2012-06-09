@@ -90,15 +90,15 @@ namespace Image{
 
 	inline
 	cv::vector<cv::Rect> detectMouth(cv::Mat image){
+		QString file = "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
+		size_t amount = 1;
+
 		cv::vector<cv::Rect> rectangles;
 		double scale = 0.4;
 		while(rectangles.size() == 0 && scale <= 1){
 			double iScale = 1/scale;
 			cv::Mat image2;
 			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
-
-			QString file = "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
-			size_t amount = 1;
 
 			cv::CascadeClassifier cc(file.toStdString());
 			cc.detectMultiScale(image2, rectangles);
@@ -136,8 +136,6 @@ namespace Image{
 				}
 			}
 
-			//TODO: we laten param en scale tegelijk stijgen :s
-
 			for(size_t i=0; i<rectangles.size(); ++i){
 				cv::Rect r = rectangles.at(i);
 				cv::Rect newR(r.x*iScale, r.y*iScale, r.width*iScale, r.height*iScale);
@@ -145,6 +143,7 @@ namespace Image{
 			}
 			scale += 0.1;
 		}
+
 		return rectangles;
 	}
 

@@ -90,16 +90,16 @@ int main(int argc, char **argv) {
 //		crossValidateYaw("positionsYaw");
 //		crossValidateYaw("positionsYawOrig");
 
-//		PitchTrainer pt = false;
-//		pt();
+		PitchTrainer pt = false;
+		pt();
 
-//		crossValidatePitch("positionsPitch");
+		crossValidatePitch("positionsPitch");
 
-	if(argc > 1){
-		param = QString(argv[1]).toDouble();
-	}
+//	if(argc > 1){
+//		param = QString(argv[1]).toDouble();
+//	}
 
-	std::cout << param << std::endl;
-	crossValidatePitch("positionsPitch");
+//	std::cout << param << std::endl;
+//	crossValidatePitch("positionsPitch");
 	return 0;
 }
