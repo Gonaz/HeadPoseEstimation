@@ -2,24 +2,25 @@
 #include "yawtrainer.h"
 #include "pitchdetector.h"
 #include "pitchtrainer.h"
+#include "facialnormal.h"
 #include <QDir>
 #include <opencv2/core/core.hpp>
 #include <iostream>
 #include "image.h"
 #include "landmarkreader.h"
 #include <opencv2/highgui/highgui.hpp>
-#include <QTime>
 
 using namespace cv;
 double param = 0.15; //own
 //double param = 0.41; //landmarks
-//double param = 6.5; //euler (3.9)
+//double param = 6.5; //euler
 
 void crossValidateYaw(QString positionsFile){
 	unsigned long correct = 0;
 	unsigned long wrong = 0;
 	unsigned long error = 0;
 	unsigned long wrongDirection = 0;
+	unsigned long wrongFrontal = 0;
 
 	QString base = "../HeadPoseEstimation/data";
 	QString extendedBase = base + "/" + "bs0";
@@ -37,6 +38,11 @@ void crossValidateYaw(QString positionsFile){
 				if(detectedYaw*realYaw < 0){
 					++wrongDirection;
 				}
+				if(detectedYaw == 0 and realYaw != 0){
+					++wrongFrontal;
+				} else if(detectedYaw != 0 and realYaw == 0){
+					++wrongFrontal;
+				}
 			} else {
 				++correct;
 			}
@@ -46,6 +52,7 @@ void crossValidateYaw(QString positionsFile){
 	std::cout << correct << "/" << (correct+wrong) << std::endl;
 	std::cout << "Average absolute error " << (error/double(correct+wrong)) << std::endl;
 	std::cout << "Wrong directions " << wrongDirection << std::endl;
+	std::cout << "Wrong frontal " << wrongFrontal << std::endl;
 }
 
 void crossValidatePitch(QString positionsFile){
@@ -53,6 +60,7 @@ void crossValidatePitch(QString positionsFile){
 	unsigned long wrong = 0;
 	unsigned long error = 0;
 	unsigned long wrongDirection = 0;
+	unsigned long wrongNeutral = 0;
 
 	QString base = "../HeadPoseEstimation/data";
 	QString extendedBase = base + "/" + "bs0";
@@ -71,6 +79,11 @@ void crossValidatePitch(QString positionsFile){
 					if(detectedPitch * realPitch < 0){
 						++wrongDirection;
 					}
+					if(detectedPitch == 0 and realPitch != 0){
+						++wrongNeutral;
+					} else if(detectedPitch != 0 and realPitch == 0){
+						++wrongNeutral;
+					}
 				} else {
 					++correct;
 				}
@@ -80,26 +93,36 @@ void crossValidatePitch(QString positionsFile){
 	std::cout << correct << "/" << (correct+wrong) << std::endl;
 	std::cout << "Average absolute error " << (error/double(correct+wrong)) << std::endl;
 	std::cout << "Wrong directions " << wrongDirection << std::endl;
+	std::cout << "Wrong neutral " << wrongNeutral << std::endl;
 }
 
 int main(int argc, char **argv) {
-//	PitchTrainer pt = false;
-//	pt.test();
-//		YawTrainer yt = false;
-//		yt();
-//		crossValidateYaw("positionsYaw");
-//		crossValidateYaw("positionsYawOrig");
+	//Make a yaw trainer that does use the landmarks
+	YawTrainer yt = true;
+	//Train the yaw detector
+	yt();
 
-		PitchTrainer pt = false;
-		pt();
+	//Cross validate with the own detection
+	crossValidateYaw("positionsYaw");
+	//Cross validate with landmarks
+	crossValidateYaw("positionsYawOrig");
 
-		crossValidatePitch("positionsPitch");
+	//Make a pitch trainer that doesn't use the landmarks
+	PitchTrainer pt = false;
+	//Train the pitch detector
+	pt();
 
-//	if(argc > 1){
-//		param = QString(argv[1]).toDouble();
-//	}
+	//The fuzziness parameter, this is a good value for the own detection
+	param = 0.15;
+	//Cross validate with the own detection
+	crossValidatePitch("positionsPitch");
 
-//	std::cout << param << std::endl;
-//	crossValidatePitch("positionsPitch");
+	//The fuzziness parameter, this is a good value for the ptich detector that uses the landmarks
+	param = 0.41;
+	//Cross validate with landmarks
+	crossValidatePitch("positionsPitchOrig");
+
+	//Use the facial normal  (http://mmlab.disi.unitn.it/wiki/index.php/Head_Pose_Estimation_using_OpenCV)
+	//facialNormal();
 	return 0;
 }

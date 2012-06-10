@@ -8,6 +8,8 @@
 #include <random>
 #include <iostream> //TODO: debug
 
+#define hybrid 0
+
 YawDetector::YawDetector(QString positionFile) : positionFile(positionFile){
 	positions = deserialize();
 }
@@ -126,14 +128,24 @@ int YawDetector::yaw(QString filename){
 }
 
 QPair<long, long> YawDetector::positionsFromFile(QString filename){
+#if hybrid
+	QString tmp = positionFile;
+	positionFile = "positionsYaw";
+#endif //hybrid
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
 	for(int i=0; i<keys.count(); ++i){
 		QFileInfo info2(keys.at(i));
 		if(info1.fileName() == info2.fileName()){
+#if hybrid
+			positionFile = tmp;
+#endif //hybrid
 			return allPositions[keys.at(i)];
 		}
 	}
+#if hybrid
+	positionFile = tmp;
+#endif //hybrid
 	return qMakePair(0l, 0l);
 }

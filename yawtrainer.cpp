@@ -9,8 +9,8 @@
 #include <functional>
 
 //Logical means that the results are logical interpretable. But the accuracy is a bit worse.
-//When logical is set, the average position of one eye is the position of that eye.
-//When logical is unset, the average position of one eye is half that position of that eye.
+//When logical is set, the position of an eye with one landmark is the position of that landmark.
+//When logical is unset, the position of an eye with one landmark is half the position of that landmark.
 #define logical 0
 
 //Sorted means that the position of the eyes will be sorted.
@@ -61,11 +61,15 @@ QPair<long, long> YawTrainer::detectPositions(QString imagePath){
 		return qMakePair(long(0), long(0));
 	} else if(eyes.size() == 1){
 		long value = Image::getRelativePositionEye(image, eyes.at(0));
+#if sorted
+		return qMakePair(value, long(0));
+#else
 		if(value < 50){
 			return qMakePair(value, long(0));
 		} else {
 			return qMakePair(long(0), value);
 		}
+#endif //sorted
 	} else {
 		if(eyes.at(0).x > eyes.at(1).x){
 			return qMakePair(Image::getRelativePositionEye(image, eyes.at(0)), Image::getRelativePositionEye(image, eyes.at(1)));

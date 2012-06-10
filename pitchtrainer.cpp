@@ -131,19 +131,3 @@ void PitchTrainer::serialize(QMap<QString, QPair<long, double> > positions){
 
 	file.close();
 }
-
-void PitchTrainer::test(){
-	//bs005_PR_D_0.png
-	QMap<QString, QPair<long, double> > result;
-
-	QString imagePath = "../HeadPoseEstimation/data/bs005/bs005_PR_SD_0.png";
-	Mat im = imread(imagePath.toStdString());
-	vector<double> fts = features(imagePath);
-	long realPitch = PitchDetector::pitch(imagePath);
-
-	double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
-
-	std::cout << "Detect " << imagePath.toStdString();
-	std::cout << "\t" << div << std::endl;
-	result[imagePath]= qMakePair(realPitch, div);
-}

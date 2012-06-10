@@ -17,6 +17,7 @@ SOURCES += main.cpp\
     landmarkreader.cpp \
     yawtrainer.cpp \
     pitchtrainer.cpp \
+    facialnormal.cpp \
 
 HEADERS  += \
     yawdetector.h \
@@ -25,6 +26,7 @@ HEADERS  += \
     landmarkreader.h \
     yawtrainer.h \
     pitchtrainer.h \
+    facialnormal.h \
 
 FORMS    +=
 
