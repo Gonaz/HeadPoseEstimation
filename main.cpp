@@ -2,7 +2,7 @@
 #include "yawtrainer.h"
 #include "pitchdetector.h"
 #include "pitchtrainer.h"
-#include "facialnormal.h"
+//#include "facialnormal.h"
 #include <QDir>
 #include <opencv2/core/core.hpp>
 #include <iostream>
