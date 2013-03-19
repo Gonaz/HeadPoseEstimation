@@ -1,14 +1,13 @@
 #include "pitchdetector.h"
 #include "image.h"
 #include "landmarkreader.h"
+#include "pitchtrainer.h"
 #include <QStringList>
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
-#include <iostream> //TODO: debug
 
 using namespace cv;
 
@@ -38,7 +37,7 @@ bool PitchDetector::containsTies(QVector<long> vec){
 	return (vec.count(max) > 1) ? true : false;
 }
 
-double PitchDetector::positionFromFile(QString filename){
+double PitchDetector::position(QString filename){
 	QFileInfo info1(filename);
 	auto allPositions = deserialize();
 	auto keys = allPositions.keys();
@@ -48,7 +47,13 @@ double PitchDetector::positionFromFile(QString filename){
 			return allPositions[keys.at(i)].second;
 		}
 	}
-	return 0;
+
+	Mat im = imread(filename.toStdString());
+	PitchTrainer pt = false;
+	vector<double> fts = pt.features(filename);
+	double div = pt.distanceMouthNose(fts, im)/pt.distanceNoseEye(fts, im);
+
+	return div;
 }
 
 QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
@@ -60,7 +65,7 @@ QVector<long> PitchDetector::detectPitch(QString filename, double fuzziness){
 		result[pair.first].push_back(pair.second);
 	}
 
-	double diff = positionFromFile(filename);
+	double diff = position(filename);
 	if(isnan(diff)){
 		diff = 0;
 	}

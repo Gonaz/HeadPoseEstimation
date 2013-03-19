@@ -19,7 +19,7 @@ private:
 
 	QVector<long> detectPitch(QString filename, double fuzziness);
 	QMap<QString, QPair<long, double> > deserialize();
-	double positionFromFile(QString filename);
+	double position(QString filename);
 	bool containsTies(QVector<long> vec);
 };
 

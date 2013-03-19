@@ -24,7 +24,7 @@ private:
 	size_t size(QPair<long, long> pair);
 	void serialize(QMap<QString, QPair<long, long> > positions);
 	QMap<QString, QPair<long, long> > deserialize();
-	QPair<long, long> positionsFromFile(QString filename);
+	QPair<long, long> position(QString filename);
 };
 
 #endif // YAWDETECTOR_H

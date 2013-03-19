@@ -7,6 +7,8 @@
 #include <functional>
 
 namespace Image{
+	const QString openCVLocation = "/opt/ros/fuerte/share/";
+	//const QString openCVLocation = "/usr/local/share/";
 
 	inline
 	long getRelativePositionEye(cv::Mat image, cv::Rect eye){
@@ -51,6 +53,14 @@ namespace Image{
 	}
 
 	inline
+	bool isFrontalView(cv::Mat image){
+		if(detect(image, openCVLocation + "OpenCV/haarcascades/haarcascade_frontalface_alt.xml", 1).size() > 0){
+			return true;
+		}
+		return false;
+	}
+
+	inline
 	cv::vector<cv::Rect> detectEyes(cv::Mat image){
 		cv::vector<cv::Rect> eyes;
 		double scale = 0.2;
@@ -58,7 +68,7 @@ namespace Image{
 			double iScale = 1/scale;
 			cv::Mat image2;
 			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
-			eyes = detect(image2, "/usr/local/share/OpenCV/haarcascades/haarcascade_eye.xml", 2);
+			eyes = detect(image2, openCVLocation + "OpenCV/haarcascades/haarcascade_eye.xml", 2);
 			if(eyes.size() > 1){
 				if(eyes.at(0).tl().y > eyes.at(1).br().y){
 					eyes.erase(eyes.begin());
@@ -90,7 +100,7 @@ namespace Image{
 
 	inline
 	cv::vector<cv::Rect> detectMouth(cv::Mat image){
-		QString file = "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
+		QString file = openCVLocation + "OpenCV/haarcascades/haarcascade_mcs_mouth.xml";
 		size_t amount = 1;
 
 		cv::vector<cv::Rect> rectangles;
@@ -155,7 +165,7 @@ namespace Image{
 			double iScale = 1/scale;
 			cv::Mat image2;
 			cv::resize(image, image2, cv::Size(image.cols*scale, image.rows*scale));
-			nose = detect(image2, "/usr/local/share/OpenCV/haarcascades/haarcascade_mcs_nose.xml", 1);
+			nose = detect(image2, openCVLocation + "OpenCV/haarcascades/haarcascade_mcs_nose.xml", 1);
 
 			for(size_t i=0; i<nose.size(); ++i){
 				cv::Rect r = nose.at(i);

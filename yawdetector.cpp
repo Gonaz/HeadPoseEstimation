@@ -1,12 +1,12 @@
 #include "yawdetector.h"
 #include "image.h"
 #include "landmarkreader.h"
+#include "yawtrainer.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
 #include <algorithm>
 #include <random>
-#include <iostream> //TODO: debug
 
 #define hybrid 0
 
@@ -35,7 +35,7 @@ size_t YawDetector::size(QPair<long, long> pair){
 }
 
 long YawDetector::operator()(QString image){
-	auto pair1 = positionsFromFile(image);
+	auto pair1 = position(image);
 	size_t eyes1Size = size(pair1);
 	long position1 = pair1.first + pair1.second;
 
@@ -127,7 +127,7 @@ int YawDetector::yaw(QString filename){
 	return rot;
 }
 
-QPair<long, long> YawDetector::positionsFromFile(QString filename){
+QPair<long, long> YawDetector::position(QString filename){
 #if hybrid
 	QString tmp = positionFile;
 	positionFile = "positionsYaw";
@@ -147,5 +147,7 @@ QPair<long, long> YawDetector::positionsFromFile(QString filename){
 #if hybrid
 	positionFile = tmp;
 #endif //hybrid
-	return qMakePair(0l, 0l);
+
+	YawTrainer yt = false;
+	return yt.detectPositions(filename);
 }

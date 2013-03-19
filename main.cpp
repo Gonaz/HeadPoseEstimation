@@ -97,30 +97,51 @@ void crossValidatePitch(QString positionsFile){
 }
 
 int main(int argc, char **argv) {
-	//Make a yaw trainer that does use the landmarks
-	YawTrainer yt = true;
-	//Train the yaw detector
-	yt();
+	if(argc > 1){
+		//Get the filename from the arguments
+		QString filename = QString::fromAscii(argv[1]);
 
-	//Cross validate with the own detection
-	crossValidateYaw("positionsYaw");
-	//Cross validate with landmarks
-	crossValidateYaw("positionsYawOrig");
+		//Print the filename
+		std::cout << filename.toStdString() << std::endl;
 
-	//Make a pitch trainer that doesn't use the landmarks
-	PitchTrainer pt = false;
-	//Train the pitch detector
-	pt();
+		//Read the image
+		cv::Mat image = imread(filename.toStdString());
 
-	//The fuzziness parameter, this is a good value for the own detection
-	param = 0.15;
-	//Cross validate with the own detection
-	crossValidatePitch("positionsPitch");
+		//If the image is a frontal view then detect the pitch
+		if(Image::isFrontalView(image)){
+			PitchDetector pd("positionsPitch");
+			std::cout << "Pitch " << pd(filename) << std::endl;
+		}
 
-	//The fuzziness parameter, this is a good value for the ptich detector that uses the landmarks
-	param = 0.41;
-	//Cross validate with landmarks
-	crossValidatePitch("positionsPitchOrig");
+		//Detect the yaw
+		YawDetector yd("positionsYaw");
+		std::cout << "Yaw " << yd(filename) << std::endl;
+	} else {
+		//Make a yaw trainer that does use the landmarks
+		YawTrainer yt = false;
+		//Train the yaw detector
+		yt();
+
+		//Cross validate with the own detection
+		crossValidateYaw("positionsYaw");
+		//Cross validate with landmarks
+		crossValidateYaw("positionsYawOrig");
+
+		//Make a pitch trainer that doesn't use the landmarks
+		PitchTrainer pt = true;
+		//Train the pitch detector
+		pt();
+
+		//The fuzziness parameter, this is a good value for the own detection
+		param = 0.15;
+		//Cross validate with the own detection
+		crossValidatePitch("positionsPitch");
+
+		//The fuzziness parameter, this is a good value for the ptich detector that uses the landmarks
+		param = 0.41;
+		//Cross validate with landmarks
+		crossValidatePitch("positionsPitchOrig");
+	}
 
 	//Use the facial normal  (http://mmlab.disi.unitn.it/wiki/index.php/Head_Pose_Estimation_using_OpenCV)
 	//facialNormal();

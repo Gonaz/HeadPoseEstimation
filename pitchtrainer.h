@@ -9,6 +9,7 @@ class PitchTrainer {
 public:
 	PitchTrainer(bool landmarks);
 	void operator()();
+	friend class PitchDetector;
 private:
 	QString positionFile;
 	std::function<cv::vector<double> (QString)> features;

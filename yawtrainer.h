@@ -9,6 +9,7 @@ class YawTrainer {
 public:
 	YawTrainer(bool landmarks);
 	void operator()();
+	friend class YawDetector;
 private:
 	QString positionFile;
 	std::function<QPair<long, long> (QString)> positions;

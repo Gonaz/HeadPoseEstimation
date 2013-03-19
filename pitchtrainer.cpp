@@ -7,7 +7,7 @@
 #include <QTextStream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <iostream> //TODO: debug
+#include <iostream>
 
 using namespace cv;
 
@@ -106,7 +106,7 @@ QMap<QString, QPair<long, double> > PitchTrainer::calculateRelativePositions(){
 
 				double div = distanceMouthNose(fts, im)/distanceNoseEye(fts, im);
 
-				std::cout << "Detect " << image.toStdString();
+				std::cout << "Detect " << imagePath.toStdString();
 				std::cout << "\t" << div << std::endl;
 				result[imagePath]= qMakePair(realPitch, div);
 			}
