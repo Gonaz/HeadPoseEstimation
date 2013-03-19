@@ -6,6 +6,7 @@ Compiling
 This application requires OpenCV. Depending on which version of OpenCV you use, you should set the value of 'openCVLocation' in the file image.h.
 
 To compile the program, execute the following commands in the source directory.
+
     mkdir build
     cd build
     qmake ../HeadPoseEstimation.pro
@@ -14,6 +15,7 @@ To compile the program, execute the following commands in the source directory.
 Data
 -----------------------------
 The program was made for the Bosphorus database. The program expects that the files have the following structure. The directory "data" contains the Bosphorus database (you can download this at https://dl.dropbox.com/u/27590885/HeadPoseEstimation.zip).
+
     src/
         data/
             bs000/
