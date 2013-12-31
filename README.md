@@ -14,7 +14,7 @@ To compile the program, execute the following commands in the source directory.
 
 Data
 -----------------------------
-The program was made for the Bosphorus database. The program expects that the files have the following structure. The directory "data" contains the Bosphorus database (you can download this at https://dl.dropbox.com/u/27590885/HeadPoseEstimation.zip).
+The program was made for the Bosphorus database. The program expects that the files have the following structure. The directory "data" contains the Bosphorus database (~~you can download this at https://dl.dropbox.com/u/27590885/HeadPoseEstimation.zip~~ this can be provided upon request).
 
     src/
         data/
