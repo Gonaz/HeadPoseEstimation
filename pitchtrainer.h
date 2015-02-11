@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QPair>
 #include <opencv2/core/core.hpp>
+#include <functional>
 
 class PitchTrainer {
 public:
