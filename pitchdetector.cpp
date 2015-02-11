@@ -9,6 +9,10 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#ifndef isnan
+#define isnan(x) ((x)!=(x))
+#endif
+
 using namespace cv;
 
 PitchDetector::PitchDetector(QString positionFile) : positionFile(positionFile){
