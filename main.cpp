@@ -99,7 +99,7 @@ void crossValidatePitch(QString positionsFile){
 int main(int argc, char **argv) {
 	if(argc > 1){
 		//Get the filename from the arguments
-		QString filename = QString::fromAscii(argv[1]);
+		QString filename = QString::fromLatin1(argv[1]);
 
 		//Print the filename
 		std::cout << filename.toStdString() << std::endl;
